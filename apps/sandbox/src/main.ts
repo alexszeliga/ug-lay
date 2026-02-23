@@ -15,8 +15,8 @@ engine.updateTile(leftChildId, { contentId: 'Left Top' });
 engine.updateTile(rightChildId, { contentId: 'Sidebar' });
 // --------------------
 
-const ICON_SPLIT_H = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12H3m9-9v18"/></svg>`;
-const ICON_SPLIT_V = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>`;
+const ICON_SPLIT_H = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>`;
+const ICON_SPLIT_V = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(90deg)"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>`;
 const ICON_REMOVE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
 
 function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
