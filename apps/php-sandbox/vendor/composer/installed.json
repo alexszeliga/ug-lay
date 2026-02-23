@@ -1,0 +1,39 @@
+{
+    "packages": [
+        {
+            "name": "ug-layout/php",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/php",
+                "reference": "8e01761f35533f47c99a18f6bd2bf32e7dcacd96"
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "UgLayout\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "UgLayout\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP DTOs and validation for ug-layout",
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../ug-layout/php"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}

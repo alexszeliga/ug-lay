@@ -18,6 +18,7 @@ import {
 export * from './types';
 export { findNode } from './tree-utils';
 export { LocalStorageAdapter } from './adapters/LocalStorageAdapter';
+export { HttpPersistenceAdapter } from './adapters/HttpPersistenceAdapter';
 
 const DEFAULT_CONFIG: LayoutEngineConfig = {
   minRatio: 0.05,

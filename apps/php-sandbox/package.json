@@ -1,0 +1,9 @@
+{
+  "name": "php-sandbox-frontend",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "vite": "^5.4.1",
+    "typescript": "^5.0.0"
+  }
+}

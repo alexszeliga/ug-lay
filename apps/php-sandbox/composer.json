@@ -1,0 +1,12 @@
+{
+    "name": "apps/php-sandbox",
+    "require": {
+        "ug-layout/php": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../packages/php"
+        }
+    ]
+}

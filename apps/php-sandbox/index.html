@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ug-layout PHP Sandbox</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #1e1e1e;
+        color: #fff;
+        font-family: system-ui;
+        overflow: hidden;
+      }
+      #app {
+        width: 100%;
+        height: calc(100% - 30px);
+      }
+      .status-bar {
+        height: 30px;
+        background: #333;
+        border-top: 1px solid #444;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        font-size: 12px;
+        color: #888;
+      }
+      .ug-tile {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8rem;
+        color: #888;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+        overflow: hidden;
+      }
+      .ug-tile-header {
+        background: #333;
+        padding: 4px 8px;
+        display: grid;
+        grid-template-columns: 80px 1fr 80px;
+        align-items: center;
+        border-bottom: 1px solid #444;
+        cursor: grab;
+      }
+      .ug-tile-header > :last-child {
+        justify-self: end;
+      }
+      .ug-tile-header > :nth-child(2) {
+        text-align: center;
+        font-weight: bold;
+        color: #ccc;
+      }
+      .ug-tile-header:active {
+        cursor: grabbing;
+      }
+      .ug-tile-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+      }
+      .picker {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+        max-width: 300px;
+      }
+      .picker-btn {
+        background: #444;
+        border: 1px solid #555;
+        color: white;
+        padding: 15px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-align: center;
+        transition: background 0.2s;
+      }
+      .picker-btn:hover {
+        background: #555;
+      }
+      .dummy-component {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 4px;
+      }
+      #maximized-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+      }
+      #maximized-overlay.active {
+        display: flex;
+      }
+      #maximized-header {
+        background: #007acc;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #maximized-content {
+        flex: 1;
+        padding: 40px;
+      }
+      .ug-tile.focused {
+        border-color: #007acc;
+      }
+      .ug-tile.focused .ug-tile-header {
+        background: #007acc;
+        color: white;
+      }
+      .ug-tile.drag-over {
+        border-color: #ffcc00;
+        box-shadow: inset 0 0 10px rgba(255, 204, 0, 0.5);
+      }
+      .ug-controls {
+        display: flex;
+        gap: 4px;
+      }
+      .ug-btn {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        opacity: 0.7;
+      }
+      .ug-btn:hover {
+        opacity: 1;
+        background: rgba(255,255,255,0.1);
+        border-radius: 2px;
+      }
+      .ug-tile.is-root {
+        width: 100%;
+        height: 100%;
+      }
+      .ug-split {
+        display: grid;
+        width: 100%;
+        height: 100%;
+      }
+      .ug-gutter {
+        background-color: #444;
+        cursor: ew-resize;
+      }
+      .ug-gutter[data-direction="vertical"] {
+        cursor: ns-resize;
+      }
+      body.dragging {
+        user-select: none;
+      }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="maximized-overlay">
+      <div id="maximized-header">
+        <strong>Maximized View</strong>
+        <button id="close-maximize" class="ug-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="maximized-content"></div>
+    </div>
+    <div class="status-bar">
+        Backend: PHP (Native) | Storage: layout.json | <span id="sync-status" style="margin-left: 5px; color: #4dff4d;">Connected</span>
+    </div>
+    <script type="module" src="/src/client.ts"></script>
+</body>
+</html>

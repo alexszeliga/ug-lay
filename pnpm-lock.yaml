@@ -16,6 +16,15 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
 
+  apps/php-sandbox:
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.1
+        version: 5.4.21
+
   apps/react-sandbox:
     dependencies:
       '@ug-layout/core':
