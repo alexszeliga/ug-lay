@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { LayoutEngine } from '@ug-layout/core';
+import React, { useMemo, useState, useEffect } from 'react';
+import { LayoutEngine, LocalStorageAdapter, LayoutState } from '@ug-layout/core';
 import { LayoutProvider, UGLayout } from '@ug-layout/react';
 
 const Analytics = () => (
@@ -35,7 +35,6 @@ const registry = {
   'chat': CustomTile,
 };
 
-// --- Custom Icons ---
 const CUSTOM_ICONS = {
   splitH: <span style={{ fontSize: '10px' }}>[H]</span>,
   splitV: <span style={{ fontSize: '10px' }}>[V]</span>,
@@ -44,21 +43,35 @@ const CUSTOM_ICONS = {
   reset: <span style={{ fontSize: '10px' }}>[R]</span>,
 };
 
+const storage = new LocalStorageAdapter('react-demo');
+
 export const App = () => {
-  const engine = useMemo(() => {
-    const e = new LayoutEngine();
-    const rootId = e.getState().root.id;
-    e.split(rootId, 'horizontal');
-    const leftId = (e.getState().root as any).children[0].id;
-    e.updateTile(leftId, { contentId: 'analytics' });
-    return e;
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [initialState, setInitialState] = useState<LayoutState | undefined>(undefined);
+
+  useEffect(() => {
+    storage.load().then((state) => {
+      if (state) setInitialState(state);
+      setIsLoaded(true);
+    });
   }, []);
+
+  const engine = useMemo(() => {
+    if (!isLoaded) return null;
+    return new LayoutEngine(initialState, {
+      persistence: storage
+    });
+  }, [isLoaded, initialState]);
+
+  if (!isLoaded || !engine) {
+    return <div style={{ background: '#1e1e1e', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Layout...</div>;
+  }
 
   return (
     <LayoutProvider 
       engine={engine} 
       registry={registry}
-      // config={{ icons: CUSTOM_ICONS }}
+      config={{ icons: CUSTOM_ICONS }}
     >
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ padding: '10px 20px', background: '#333', borderBottom: '1px solid #444' }}>
