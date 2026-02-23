@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { LayoutEngine } from '@ug-layout/core';
-import { LayoutProvider, UGLayout, useLayout } from '@ug-layout/react';
+import { LayoutProvider, UGLayout } from '@ug-layout/react';
 
 const Analytics = () => (
   <div style={{ padding: '20px', background: '#ff4d4d22', border: '1px solid #ff4d4d', height: '100%', boxSizing: 'border-box' }}>
@@ -16,25 +16,13 @@ const Chat = () => (
   </div>
 );
 
-const TileControls = ({ nodeId }: { nodeId: string }) => {
-  const { engine } = useLayout();
-  return (
-    <div style={{ position: 'absolute', top: 5, right: 5, display: 'flex', gap: 5 }}>
-      <button onClick={() => engine.split(nodeId, 'horizontal')}>H</button>
-      <button onClick={() => engine.split(nodeId, 'vertical')}>V</button>
-      <button onClick={() => engine.removeTile(nodeId)} style={{ color: 'red' }}>X</button>
-    </div>
-  );
-};
-
 const CustomTile = ({ node }: any) => {
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <TileControls nodeId={node.id} />
+    <div style={{ width: '100%', height: '100%' }}>
       {node.contentId === 'analytics' && <Analytics />}
       {node.contentId === 'chat' && <Chat />}
       {!node.contentId && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', border: '1px dashed #444' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', border: '1px dashed #444', color: '#666' }}>
           Empty React Tile
         </div>
       )}
@@ -42,11 +30,9 @@ const CustomTile = ({ node }: any) => {
   );
 };
 
-// We wrap the TileComponent to inject our controls
 const registry = {
   'analytics': CustomTile,
   'chat': CustomTile,
-  'empty': CustomTile
 };
 
 export const App = () => {
@@ -54,7 +40,8 @@ export const App = () => {
     const e = new LayoutEngine();
     const rootId = e.getState().root.id;
     e.split(rootId, 'horizontal');
-    const leftId = (e.getState().root as any).children[0].id;
+    const state = e.getState();
+    const leftId = (state.root as any).children[0].id;
     e.updateTile(leftId, { contentId: 'analytics' });
     return e;
   }, []);
