@@ -1,9 +1,10 @@
 import { LayoutEngine, LayoutNode, Direction, TileNode } from '@ug-layout/core';
 import { SandboxState } from './logic';
+import { SANDBOX_CONFIG } from './config';
 
 const engine = new LayoutEngine();
 const sandbox = new SandboxState(engine);
-sandbox.dragHandleSelector = '.ug-tile-header';
+sandbox.dragHandleSelector = SANDBOX_CONFIG.dragHandleSelector;
 
 // --- Registry ---
 const REGISTRY: Record<string, { name: string; color: string }> = {
@@ -13,19 +14,12 @@ const REGISTRY: Record<string, { name: string; color: string }> = {
   'inspector': { name: 'Inspector', color: '#ffff4d' },
 };
 
-// --- Icons ---
-const ICON_SPLIT_H = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>`;
-const ICON_SPLIT_V = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(90deg)"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>`;
-const ICON_REMOVE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
-const ICON_MAXIMIZE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>`;
-
 // --- Initial Setup ---
 const rootId = engine.getState().root.id;
 engine.split(rootId, 'horizontal');
 const state = engine.getState();
 const leftId = (state.root as any).children[0].id;
-const rightId = (state.root as any).children[1].id;
-engine.updateTile(leftId, { contentId: 'analytics' });
+engine.updateTile(leftId, { contentId: SANDBOX_CONFIG.defaultContentId });
 // --------------------
 
 function renderPicker(tileId: string): string {
@@ -45,9 +39,7 @@ function renderPicker(tileId: string): string {
 }
 
 function renderTileContent(node: TileNode): string {
-  if (!node.contentId) {
-    return renderPicker(node.id);
-  }
+  if (!node.contentId) return renderPicker(node.id);
   const info = REGISTRY[node.contentId];
   return `
     <div class="dummy-component" style="background: ${info?.color || '#444'}22; border: 1px solid ${info?.color || '#444'}">
@@ -68,10 +60,10 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
       <div class="ug-tile-header" draggable="true">
         <span>${node.id.substring(0, 8)}</span>
         <div class="ug-controls">
-          <button class="ug-btn" data-action="maximize" data-id="${node.id}" title="Maximize">${ICON_MAXIMIZE}</button>
-          <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="horizontal" title="Split Horizontal">${ICON_SPLIT_H}</button>
-          <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="vertical" title="Split Vertical">${ICON_SPLIT_V}</button>
-          <button class="ug-btn" data-action="remove" data-id="${node.id}" style="color: #ff4d4d;" title="Remove">${ICON_REMOVE}</button>
+          <button class="ug-btn" data-action="maximize" data-id="${node.id}" title="Maximize">${SANDBOX_CONFIG.icons.maximize}</button>
+          <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="horizontal" title="Split Horizontal">${SANDBOX_CONFIG.icons.splitH}</button>
+          <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="vertical" title="Split Vertical">${SANDBOX_CONFIG.icons.splitV}</button>
+          <button class="ug-btn" data-action="remove" data-id="${node.id}" style="color: ${SANDBOX_CONFIG.colors.remove};" title="Remove">${SANDBOX_CONFIG.icons.remove}</button>
         </div>
       </div>
       <div class="ug-tile-content">
@@ -89,11 +81,12 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
   gutter.dataset.splitId = node.id;
   gutter.dataset.direction = node.direction;
 
+  const gSize = SANDBOX_CONFIG.gutterSize;
   if (node.direction === 'horizontal') {
-    el.style.gridTemplateColumns = `calc(${r * 100}% - 2px) 4px 1fr`;
+    el.style.gridTemplateColumns = `calc(${r * 100}% - ${gSize/2}px) ${gSize}px 1fr`;
     el.style.gridTemplateRows = '100%';
   } else {
-    el.style.gridTemplateRows = `calc(${r * 100}% - 2px) 4px 1fr`;
+    el.style.gridTemplateRows = `calc(${r * 100}% - ${gSize/2}px) ${gSize}px 1fr`;
     el.style.gridTemplateColumns = '100%';
   }
 
@@ -109,13 +102,10 @@ function updateDOM() {
   const overlay = document.getElementById('maximized-overlay');
   const overlayContent = document.getElementById('maximized-content');
 
-  // Handle maximized state
   if (state.maximizedTileId) {
     overlay?.classList.add('active');
     const maximizedNode = findNode(state.root, state.maximizedTileId) as TileNode;
-    if (maximizedNode && overlayContent) {
-      overlayContent.innerHTML = renderTileContent(maximizedNode);
-    }
+    if (maximizedNode && overlayContent) overlayContent.innerHTML = renderTileContent(maximizedNode);
   } else {
     overlay?.classList.remove('active');
   }
@@ -148,41 +138,32 @@ document.body.addEventListener('click', (event) => {
   }
 
   const { action, id, tileId, contentId, direction } = btn.dataset;
-
-  if (action === 'select' && tileId && contentId) {
-    engine.updateTile(tileId, { contentId });
-  } else if (action === 'maximize' && id) {
-    engine.maximizeTile(id);
-  } else if (action === 'split' && id && direction) {
-    engine.split(id, direction as Direction);
-  } else if (action === 'remove' && id) {
-    engine.removeTile(id);
-  }
+  if (action === 'select' && tileId && contentId) engine.updateTile(tileId, { contentId });
+  else if (action === 'maximize' && id) engine.maximizeTile(id);
+  else if (action === 'split' && id && direction) engine.split(id, direction as Direction);
+  else if (action === 'remove' && id) engine.removeTile(id);
 });
 
-document.getElementById('close-maximize')?.addEventListener('click', () => {
-  engine.minimize();
-});
+document.getElementById('close-maximize')?.addEventListener('click', () => engine.minimize());
 
-// --- Reuse existing drag logic from previous steps ---
-let dragState: { splitId: string; direction: Direction; rect: DOMRect } | null = null;
+let dragResizeState: { splitId: string; direction: Direction; rect: DOMRect } | null = null;
 document.body.addEventListener('mousedown', (e) => {
   const t = e.target as HTMLElement;
   sandbox.lastMouseDownTarget = t;
   if (t.matches('.ug-gutter')) {
     e.preventDefault();
-    dragState = { splitId: t.dataset.splitId!, direction: t.dataset.direction as any, rect: t.parentElement!.getBoundingClientRect() };
+    dragResizeState = { splitId: t.dataset.splitId!, direction: t.dataset.direction as any, rect: t.parentElement!.getBoundingClientRect() };
     document.body.classList.add('dragging');
   }
 });
 document.body.addEventListener('mousemove', (e) => {
-  if (!dragState) return;
-  const { splitId, direction, rect } = dragState;
-  const size = 4;
-  let r = direction === 'horizontal' ? (e.clientX - rect.left - size/2) / (rect.width - size) : (e.clientY - rect.top - size/2) / (rect.height - size);
-  engine.setRatio(splitId, Math.max(0.05, Math.min(0.95, r)));
+  if (!dragResizeState) return;
+  const { splitId, direction, rect } = dragResizeState;
+  const gSize = SANDBOX_CONFIG.gutterSize;
+  let r = direction === 'horizontal' ? (e.clientX - rect.left - gSize/2) / (rect.width - gSize) : (e.clientY - rect.top - gSize/2) / (rect.height - gSize);
+  engine.setRatio(splitId, r);
 });
-document.body.addEventListener('mouseup', () => { dragState = null; document.body.classList.remove('dragging'); });
+document.body.addEventListener('mouseup', () => { dragResizeState = null; document.body.classList.remove('dragging'); });
 
 document.body.addEventListener('dragstart', (e) => {
   if (!sandbox.canStartDrag(e.target as any)) { e.preventDefault(); return; }

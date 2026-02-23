@@ -171,4 +171,22 @@ describe('LayoutEngine', () => {
     // 4. Assert that the second child is empty
     expect(root.children[1].contentId).toBeUndefined();
   });
+
+  it('should respect custom configuration for min/max ratios', () => {
+    const engine = new LayoutEngine(undefined, {
+      minRatio: 0.2,
+      maxRatio: 0.8
+    });
+
+    engine.split(engine.getState().root.id, 'horizontal');
+    const splitId = engine.getState().root.id;
+
+    // Try to set ratio below custom min
+    engine.setRatio(splitId, 0.1);
+    expect((engine.getState().root as any).ratio).toBe(0.2);
+
+    // Try to set ratio above custom max
+    engine.setRatio(splitId, 0.9);
+    expect((engine.getState().root as any).ratio).toBe(0.8);
+  });
 });

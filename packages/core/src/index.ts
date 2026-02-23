@@ -28,13 +28,27 @@ export interface LayoutState {
   maximizedTileId: string | null;
 }
 
+export interface LayoutEngineConfig {
+  minRatio: number;
+  maxRatio: number;
+  defaultSplitRatio: number;
+}
+
+const DEFAULT_CONFIG: LayoutEngineConfig = {
+  minRatio: 0.05,
+  maxRatio: 0.95,
+  defaultSplitRatio: 0.5
+};
+
 export type Subscriber = (state: LayoutState) => void;
 
 export class LayoutEngine {
   private state: LayoutState;
   private subscribers: Subscriber[] = [];
+  private config: LayoutEngineConfig;
 
-  constructor(initialState?: LayoutState) {
+  constructor(initialState?: LayoutState, config?: Partial<LayoutEngineConfig>) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
     this.state = initialState || {
       root: {
         id: uuidv4(),
@@ -70,7 +84,8 @@ export class LayoutEngine {
   }
 
   setRatio(splitId: string, ratio: number): void {
-    this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio }, 'split');
+    const clampedRatio = Math.max(this.config.minRatio, Math.min(this.config.maxRatio, ratio));
+    this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio: clampedRatio }, 'split');
     this.notify();
   }
 
@@ -81,7 +96,6 @@ export class LayoutEngine {
 
   removeTile(tileId: string): void {
     if (this.state.root.id === tileId && this.state.root.type === 'tile') {
-      console.warn('Cannot remove the root tile.');
       return;
     }
     this.state.root = this.recursiveRemove(this.state.root, tileId);
@@ -91,28 +105,17 @@ export class LayoutEngine {
   swapTiles(sourceId: string, targetId: string): void {
     const sourceNode = this.findNode(this.state.root, sourceId) as TileNode;
     const targetNode = this.findNode(this.state.root, targetId) as TileNode;
-
-    if (!sourceNode || !targetNode || sourceNode.type !== 'tile' || targetNode.type !== 'tile') {
-      return;
-    }
+    if (!sourceNode || !targetNode || sourceNode.type !== 'tile' || targetNode.type !== 'tile') return;
 
     const sourceData = { ...sourceNode };
     const targetData = { ...targetNode };
-
     this.state.root = this.recursiveSwap(this.state.root, sourceId, targetId, sourceData, targetData);
     this.notify();
   }
 
-  private recursiveSwap(
-    node: LayoutNode,
-    idA: string,
-    idB: string,
-    dataA: TileNode,
-    dataB: TileNode
-  ): LayoutNode {
+  private recursiveSwap(node: LayoutNode, idA: string, idB: string, dataA: TileNode, dataB: TileNode): LayoutNode {
     if (node.id === idA) return { ...dataB };
     if (node.id === idB) return { ...dataA };
-
     if (node.type === 'split') {
       return {
         ...node,
@@ -138,19 +141,11 @@ export class LayoutEngine {
     return null;
   }
 
-  private recursiveUpdate(
-    node: LayoutNode,
-    id: string,
-    updates: any,
-    expectedType?: TileType
-  ): LayoutNode {
+  private recursiveUpdate(node: LayoutNode, id: string, updates: any, expectedType?: TileType): LayoutNode {
     if (node.id === id) {
-      if (expectedType && node.type !== expectedType) {
-        return node;
-      }
+      if (expectedType && node.type !== expectedType) return node;
       return { ...node, ...updates };
     }
-
     if (node.type === 'split') {
       return {
         ...node,
@@ -160,14 +155,11 @@ export class LayoutEngine {
         ],
       };
     }
-
     return node;
   }
 
   private recursiveRemove(node: LayoutNode, tileId: string): LayoutNode {
-    if (node.type === 'tile') {
-      return node;
-    }
+    if (node.type === 'tile') return node;
     const childA = node.children[0];
     const childB = node.children[1];
     if (childA.id === tileId) return childB;
@@ -181,18 +173,14 @@ export class LayoutEngine {
     };
   }
 
-  private recursiveSplit(
-    node: LayoutNode,
-    tileId: string,
-    direction: Direction
-  ): LayoutNode {
+  private recursiveSplit(node: LayoutNode, tileId: string, direction: Direction): LayoutNode {
     if (node.type === 'tile') {
       if (node.id === tileId) {
         return {
           id: uuidv4(),
           type: 'split',
           direction,
-          ratio: 0.5,
+          ratio: this.config.defaultSplitRatio,
           children: [
             { 
               id: uuidv4(), 
