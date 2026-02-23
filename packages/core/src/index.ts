@@ -68,6 +68,16 @@ export class LayoutEngine {
     this.notify();
   }
 
+  removeTile(tileId: string): void {
+    // If the root is the tile to be removed, we can't do anything.
+    if (this.state.root.id === tileId && this.state.root.type === 'tile') {
+      console.warn('Cannot remove the root tile.');
+      return;
+    }
+    this.state.root = this.recursiveRemove(this.state.root, tileId);
+    this.notify();
+  }
+
   split(tileId: string, direction: Direction): void {
     this.state.root = this.recursiveSplit(this.state.root, tileId, direction);
     this.notify();
@@ -97,6 +107,35 @@ export class LayoutEngine {
     }
 
     return node;
+  }
+
+  private recursiveRemove(node: LayoutNode, tileId: string): LayoutNode {
+    if (node.type === 'tile') {
+      return node;
+    }
+
+    // Check if one of the children is the tile to be removed
+    const childA = node.children[0];
+    const childB = node.children[1];
+
+    if (childA.id === tileId) {
+      // Promote child B
+      return childB;
+    }
+
+    if (childB.id === tileId) {
+      // Promote child A
+      return childA;
+    }
+
+    // Recurse deeper
+    return {
+      ...node,
+      children: [
+        this.recursiveRemove(childA, tileId),
+        this.recursiveRemove(childB, tileId),
+      ],
+    };
   }
 
   private recursiveSplit(

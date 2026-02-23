@@ -105,4 +105,39 @@ describe('LayoutEngine', () => {
     expect(subscriber).toHaveBeenCalled();
     expect(subscriber).toHaveBeenCalledWith(engine.getState());
   });
+
+  it('should remove a tile and promote its sibling', () => {
+    const engine = new LayoutEngine();
+    // 1. Create a split
+    engine.split(engine.getState().root.id, 'horizontal');
+    const splitState = engine.getState().root as any;
+    const tileA_id = splitState.children[0].id;
+    const tileB_id = splitState.children[1].id;
+    
+    // 2. Remove Tile A
+    engine.removeTile(tileA_id);
+
+    // 3. Assert that Tile B is now the root
+    const finalState = engine.getState();
+    expect(finalState.root.id).toBe(tileB_id);
+    expect(finalState.root.type).toBe('tile');
+  });
+
+  it('should remove a nested tile correctly', () => {
+    const engine = new LayoutEngine();
+    // Path: root -> split(A, B) -> split(C, D)
+    engine.split(engine.getState().root.id, 'horizontal'); // Root -> A, B
+    const root = engine.getState().root as any;
+    const tileA_id = root.children[0].id;
+    engine.split(tileA_id, 'vertical'); // A -> C, D
+
+    const tileC_id = (engine.getState().root as any).children[0].children[0].id;
+    
+    engine.removeTile(tileC_id);
+
+    // After removing C, D should be promoted and become A's replacement.
+    const finalRoot = engine.getState().root as any;
+    expect(finalRoot.children[0].type).toBe('tile'); // D is now the first child
+    expect(finalRoot.children.length).toBe(2);
+  });
 });

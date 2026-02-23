@@ -23,6 +23,7 @@ function renderNode(node: LayoutNode): HTMLElement {
         ${node.contentId ? `<span>[${node.contentId}]</span>` : ''}
         <button data-action="split" data-id="${node.id}" data-direction="horizontal">Split H</button>
         <button data-action="split" data-id="${node.id}" data-direction="vertical">Split V</button>
+        <button data-action="remove" data-id="${node.id}" style="color: red;">Remove</button>
       </div>
     `;
     return el;
@@ -119,6 +120,10 @@ document.body.addEventListener('click', (event) => {
     const id = target.dataset.id!;
     const direction = target.dataset.direction! as Direction;
     engine.split(id, direction);
+  }
+  if (target.matches('button[data-action="remove"]')) {
+    const id = target.dataset.id!;
+    engine.removeTile(id);
   }
 });
 
