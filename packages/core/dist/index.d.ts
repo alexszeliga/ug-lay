@@ -18,16 +18,34 @@ interface SplitNode extends BaseNode {
 type LayoutNode = TileNode | SplitNode;
 interface LayoutState {
     root: LayoutNode;
+    maximizedTileId: string | null;
 }
+interface LayoutEngineConfig {
+    minRatio: number;
+    maxRatio: number;
+    defaultSplitRatio: number;
+}
+type Subscriber = (state: LayoutState) => void;
 declare class LayoutEngine {
     private state;
-    constructor(initialState?: LayoutState);
+    private subscribers;
+    private config;
+    constructor(initialState?: LayoutState, config?: Partial<LayoutEngineConfig>);
+    subscribe(callback: Subscriber): () => void;
+    private notify;
     getState(): LayoutState;
+    maximizeTile(tileId: string): void;
+    minimize(): void;
     setRatio(splitId: string, ratio: number): void;
     updateTile(tileId: string, updates: Partial<Omit<TileNode, 'id' | 'type'>>): void;
+    removeTile(tileId: string): void;
+    swapTiles(sourceId: string, targetId: string): void;
+    private recursiveSwap;
     split(tileId: string, direction: Direction): void;
+    private findNode;
     private recursiveUpdate;
+    private recursiveRemove;
     private recursiveSplit;
 }
 
-export { type BaseNode, type Direction, LayoutEngine, type LayoutNode, type LayoutState, type SplitNode, type TileNode, type TileType };
+export { type BaseNode, type Direction, LayoutEngine, type LayoutEngineConfig, type LayoutNode, type LayoutState, type SplitNode, type Subscriber, type TileNode, type TileType };
