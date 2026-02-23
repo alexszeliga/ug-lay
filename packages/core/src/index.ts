@@ -44,7 +44,6 @@ export class LayoutEngine {
 
   subscribe(callback: Subscriber): () => void {
     this.subscribers.push(callback);
-    // Return an unsubscribe function
     return () => {
       this.subscribers = this.subscribers.filter(sub => sub !== callback);
     };
@@ -69,7 +68,6 @@ export class LayoutEngine {
   }
 
   removeTile(tileId: string): void {
-    // If the root is the tile to be removed, we can't do anything.
     if (this.state.root.id === tileId && this.state.root.type === 'tile') {
       console.warn('Cannot remove the root tile.');
       return;
@@ -83,17 +81,36 @@ export class LayoutEngine {
     const targetNode = this.findNode(this.state.root, targetId) as TileNode;
 
     if (!sourceNode || !targetNode || sourceNode.type !== 'tile' || targetNode.type !== 'tile') {
-      console.warn('Both source and target must be tiles to swap.');
       return;
     }
 
-    const { contentId: sourceContent, metadata: sourceMeta } = sourceNode;
-    const { contentId: targetContent, metadata: targetMeta } = targetNode;
-    
-    this.state.root = this.recursiveUpdate(this.state.root, sourceId, { contentId: targetContent, metadata: targetMeta }, 'tile');
-    this.state.root = this.recursiveUpdate(this.state.root, targetId, { contentId: sourceContent, metadata: sourceMeta }, 'tile');
-    
+    const sourceData = { ...sourceNode };
+    const targetData = { ...targetNode };
+
+    this.state.root = this.recursiveSwap(this.state.root, sourceId, targetId, sourceData, targetData);
     this.notify();
+  }
+
+  private recursiveSwap(
+    node: LayoutNode,
+    idA: string,
+    idB: string,
+    dataA: TileNode,
+    dataB: TileNode
+  ): LayoutNode {
+    if (node.id === idA) return { ...dataB };
+    if (node.id === idB) return { ...dataA };
+
+    if (node.type === 'split') {
+      return {
+        ...node,
+        children: [
+          this.recursiveSwap(node.children[0], idA, idB, dataA, dataB),
+          this.recursiveSwap(node.children[1], idA, idB, dataA, dataB),
+        ],
+      };
+    }
+    return node;
   }
 
   split(tileId: string, direction: Direction): void {
@@ -139,22 +156,10 @@ export class LayoutEngine {
     if (node.type === 'tile') {
       return node;
     }
-
-    // Check if one of the children is the tile to be removed
     const childA = node.children[0];
     const childB = node.children[1];
-
-    if (childA.id === tileId) {
-      // Promote child B
-      return childB;
-    }
-
-    if (childB.id === tileId) {
-      // Promote child A
-      return childA;
-    }
-
-    // Recurse deeper
+    if (childA.id === tileId) return childB;
+    if (childB.id === tileId) return childA;
     return {
       ...node,
       children: [
@@ -184,7 +189,6 @@ export class LayoutEngine {
       }
       return node;
     }
-
     return {
       ...node,
       children: [
