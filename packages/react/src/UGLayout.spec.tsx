@@ -163,4 +163,27 @@ describe('UGLayout', () => {
 
     expect(resetSpy).toHaveBeenCalledWith(rootId);
   });
+
+  it('should support strict component types in the registry', () => {
+    const engine = new LayoutEngine();
+    
+    // We want to test that the component receives the correct props
+    const MyComponent: React.FC<{ node: any }> = ({ node }) => (
+      <div data-testid="strict-component">{node.contentId}</div>
+    );
+
+    const registry = {
+      'test': MyComponent
+    };
+
+    engine.updateTile(engine.getState().root.id, { contentId: 'test' });
+
+    render(
+      <LayoutProvider engine={engine} registry={registry}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    expect(screen.getByTestId('strict-component')).toHaveTextContent('test');
+  });
 });

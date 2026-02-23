@@ -5,13 +5,13 @@ import { ICON_REMOVE } from '../icons';
 import { ControlButton } from './ControlButton';
 import { DefaultPicker } from './DefaultPicker';
 
-export interface MaximizedOverlayProps {
-  node: TileNode;
+export interface MaximizedOverlayProps<TMetadata = any> {
+  node: TileNode<TMetadata>;
 }
 
-export const MaximizedOverlay: React.FC<MaximizedOverlayProps> = ({ node }) => {
-  const { engine, registry, config } = useLayout();
-  const Component = node.contentId && registry ? registry[node.contentId] : null;
+export function MaximizedOverlay<TMetadata = any>({ node }: MaximizedOverlayProps<TMetadata>) {
+  const { engine, registry, config } = useLayout<TMetadata>();
+  const Component = node.contentId && registry ? (registry[node.contentId] as React.ComponentType<any>) : null;
 
   const icons = {
     remove: config?.icons?.remove || ICON_REMOVE,
@@ -41,4 +41,4 @@ export const MaximizedOverlay: React.FC<MaximizedOverlayProps> = ({ node }) => {
       </div>
     </div>
   );
-};
+}

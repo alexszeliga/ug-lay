@@ -5,14 +5,14 @@ import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET } fr
 import { ControlButton } from './ControlButton';
 import { DefaultPicker } from './DefaultPicker';
 
-export interface TileComponentProps {
-  node: TileNode;
+export interface TileComponentProps<TMetadata = any> {
+  node: TileNode<TMetadata>;
 }
 
-export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
-  const { registry, engine, setDraggedId, draggedId, config } = useLayout();
+export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMetadata>) {
+  const { registry, engine, setDraggedId, draggedId, config } = useLayout<TMetadata>();
   const [isOver, setIsOver] = useState(false);
-  const Component = node.contentId && registry ? registry[node.contentId] : null;
+  const Component = node.contentId && registry ? (registry[node.contentId] as React.ComponentType<TileComponentProps<TMetadata>>) : null;
 
   const icons = {
     maximize: config?.icons?.maximize || ICON_MAXIMIZE,
@@ -82,4 +82,4 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
       </div>
     </div>
   );
-};
+}

@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useMemo, useSyncExternalStore, useState } from 'react';
-import { LayoutEngine, LayoutState } from '@ug-layout/core';
+import { LayoutEngine, LayoutState, TileNode } from '@ug-layout/core';
+
+export interface TileComponentProps<TMetadata = any> {
+  node: TileNode<TMetadata>;
+}
+
+export type ComponentRegistry<TMetadata = any> = Record<string, React.ComponentType<TileComponentProps<TMetadata>>>;
 
 export interface LayoutConfig {
   icons?: {
@@ -11,25 +17,30 @@ export interface LayoutConfig {
   };
 }
 
-export interface LayoutContextValue {
-  engine: LayoutEngine;
-  state: LayoutState;
-  registry?: Record<string, React.ComponentType<any>>;
+export interface LayoutContextValue<TMetadata = any> {
+  engine: LayoutEngine<TMetadata>;
+  state: LayoutState<TMetadata>;
+  registry?: ComponentRegistry<TMetadata>;
   config?: LayoutConfig;
   draggedId: string | null;
   setDraggedId: (id: string | null) => void;
 }
 
-const LayoutContext = createContext<LayoutContextValue | null>(null);
+const LayoutContext = createContext<LayoutContextValue<any> | null>(null);
 
-export interface LayoutProviderProps {
-  engine: LayoutEngine;
-  registry?: Record<string, React.ComponentType<any>>;
+export interface LayoutProviderProps<TMetadata = any> {
+  engine: LayoutEngine<TMetadata>;
+  registry?: ComponentRegistry<TMetadata>;
   config?: LayoutConfig;
   children: React.ReactNode;
 }
 
-export const LayoutProvider: React.FC<LayoutProviderProps> = ({ engine, registry, config, children }) => {
+export function LayoutProvider<TMetadata = any>({ 
+  engine, 
+  registry, 
+  config, 
+  children 
+}: LayoutProviderProps<TMetadata>) {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const state = useSyncExternalStore(
     (callback) => engine.subscribe(callback),
@@ -45,12 +56,12 @@ export const LayoutProvider: React.FC<LayoutProviderProps> = ({ engine, registry
       {children}
     </LayoutContext.Provider>
   );
-};
+}
 
-export const useLayout = (): LayoutContextValue => {
+export const useLayout = <TMetadata = any>(): LayoutContextValue<TMetadata> => {
   const context = useContext(LayoutContext);
   if (!context) {
     throw new Error('useLayout must be used within a LayoutProvider');
   }
-  return context;
+  return context as LayoutContextValue<TMetadata>;
 };

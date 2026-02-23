@@ -3,11 +3,11 @@ import { SplitNode } from '@ug-layout/core';
 import { LayoutNodeComponent } from './LayoutNode';
 import { Gutter } from './Gutter';
 
-export interface SplitComponentProps {
-  node: SplitNode;
+export interface SplitComponentProps<TMetadata = any> {
+  node: SplitNode<TMetadata>;
 }
 
-export const SplitComponent: React.FC<SplitComponentProps> = ({ node }) => {
+export function SplitComponent<TMetadata = any>({ node }: SplitComponentProps<TMetadata>) {
   const r = node.ratio;
   const gutterSize = 4;
   const style: React.CSSProperties = {
@@ -25,4 +25,4 @@ export const SplitComponent: React.FC<SplitComponentProps> = ({ node }) => {
       <LayoutNodeComponent node={node.children[1]} />
     </div>
   );
-};
+}

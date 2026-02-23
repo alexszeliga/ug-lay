@@ -6,8 +6,8 @@ import { findTile } from './utils';
 
 export * from './context';
 
-export const UGLayout: React.FC = () => {
-  const { state } = useLayout();
+export function UGLayout<TMetadata = any>() {
+  const { state } = useLayout<TMetadata>();
   const maximizedNode = state.maximizedTileId ? findTile(state.root, state.maximizedTileId) : null;
 
   return (
@@ -16,4 +16,4 @@ export const UGLayout: React.FC = () => {
       {maximizedNode && <MaximizedOverlay node={maximizedNode} />}
     </div>
   );
-};
+}
