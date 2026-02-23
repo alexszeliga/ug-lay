@@ -154,7 +154,7 @@ document.addEventListener('keydown', (event) => {
     engine.split(focusedTileId, 'vertical');
   }
 
-  if (event.ctrlKey && event.key === 'w') {
+  if (event.ctrlKey && event.key === 'x') {
     event.preventDefault();
     engine.removeTile(focusedTileId);
     // Find a new tile to focus
