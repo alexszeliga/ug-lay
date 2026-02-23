@@ -45,7 +45,7 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
       ref={ref} 
       className="ug-gutter" 
       style={{ 
-        backgroundColor: '#444', 
+        backgroundColor: 'var(--ug-gutter-bg, #444)', 
         cursor: direction === 'horizontal' ? 'ew-resize' : 'ns-resize', 
         zIndex: 10 
       }} 

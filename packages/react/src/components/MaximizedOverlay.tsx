@@ -18,12 +18,12 @@ export const MaximizedOverlay: React.FC<MaximizedOverlayProps> = ({ node }) => {
       className="ug-maximized-overlay" 
       style={{ 
         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
-        background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', flexDirection: 'column' 
+        background: 'var(--ug-overlay-bg, rgba(0,0,0,0.9))', zIndex: 1000, display: 'flex', flexDirection: 'column' 
       }}
     >
       <div 
         style={{ 
-          background: '#007acc', padding: '10px 20px', display: 'flex', 
+          background: 'var(--ug-overlay-header-bg, #007acc)', padding: '10px 20px', display: 'flex', 
           justifyContent: 'space-between', alignSelf: 'stretch', alignItems: 'center' 
         }}
       >

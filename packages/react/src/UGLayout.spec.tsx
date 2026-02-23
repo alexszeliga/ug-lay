@@ -116,4 +116,16 @@ describe('UGLayout', () => {
 
     expect(screen.getByText(/Maximized View/i)).toBeInTheDocument();
   });
+
+  it('should use CSS variables for themeable aesthetic styles', () => {
+    render(
+      <LayoutProvider engine={new LayoutEngine()}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    const tile = document.querySelector('.ug-tile') as HTMLElement;
+    // We check if the style attribute contains the variable reference
+    expect(tile.style.backgroundColor).toContain('var(--ug-tile-bg');
+  });
 });

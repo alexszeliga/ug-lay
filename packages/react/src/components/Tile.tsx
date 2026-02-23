@@ -35,7 +35,7 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
     setDraggedId(null);
   };
 
-  const borderStyle = isOver ? '2px solid #ffcc00' : '1px solid #444';
+  const borderStyle = isOver ? 'var(--ug-tile-border-dragover, 2px solid #ffcc00)' : 'var(--ug-tile-border, 1px solid #444)';
 
   return (
     <div 
@@ -46,7 +46,7 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
       style={{ 
         width: '100%', height: '100%', display: 'flex', flexDirection: 'column', 
         boxSizing: 'border-box', border: borderStyle, overflow: 'hidden',
-        backgroundColor: '#2a2a2a'
+        backgroundColor: 'var(--ug-tile-bg, #2a2a2a)'
       }}
     >
       <div 
@@ -54,13 +54,13 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
         draggable 
         onDragStart={onDragStart}
         style={{ 
-          background: '#333', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
+          background: 'var(--ug-header-bg, #333)', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
           display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center',
-          borderBottom: '1px solid #444', color: '#888'
+          borderBottom: 'var(--ug-header-border-bottom, 1px solid #444)', color: 'var(--ug-header-text, #888)'
         }}
       >
         <span style={{ opacity: 0.5 }}>{node.id.substring(0, 8)}</span>
-        <span style={{ fontWeight: 'bold', color: '#ccc', textAlign: 'center' }}>{node.contentId || ''}</span>
+        <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center' }}>{node.contentId || ''}</span>
         <div className="ug-controls" style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
           <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{ICON_MAXIMIZE}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{ICON_SPLIT_H}</ControlButton>
