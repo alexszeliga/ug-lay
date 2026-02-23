@@ -66,6 +66,8 @@ export class LayoutEngine {
   }
 
   private notify(): void {
+    // Create a new state reference to satisfy React's immutability requirements
+    this.state = { ...this.state };
     this.subscribers.forEach(sub => sub(this.state));
   }
 

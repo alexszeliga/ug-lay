@@ -48,7 +48,7 @@ const Gutter: React.FC<{ splitId: string; direction: Direction }> = ({ splitId, 
     if (!parent) return;
 
     const rect = parent.getBoundingClientRect();
-    const gutterSize = 4; // Should probably be configurable via context
+    const gutterSize = 4;
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       let newRatio;
@@ -85,10 +85,18 @@ const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
   const Component = node.contentId && registry ? registry[node.contentId] : null;
 
   return (
-    <div className="ug-tile" data-tile-id={node.id} style={{ width: '100%', height: '100%', boxSizing: 'border-box', position: 'relative' }}>
+    <div className="ug-tile" data-tile-id={node.id} style={{ width: '100%', height: '100%', boxSizing: 'border-box', position: 'relative', overflow: 'hidden' }}>
       {Component ? <Component node={node} /> : <div>Tile {node.id.substring(0, 8)}</div>}
     </div>
   );
+};
+
+// Forward declaration of the dispatcher
+const LayoutNodeComponent: React.FC<{ node: LayoutNode }> = ({ node }) => {
+  if (node.type === 'tile') {
+    return <TileComponent node={node} />;
+  }
+  return <SplitComponent node={node} />;
 };
 
 const SplitComponent: React.FC<{ node: SplitNode }> = ({ node }) => {
@@ -117,21 +125,8 @@ const SplitComponent: React.FC<{ node: SplitNode }> = ({ node }) => {
   );
 };
 
-const LayoutNodeComponent: React.FC<{ node: LayoutNode }> = ({ node }) => {
-  if (node.type === 'tile') {
-    return <TileComponent node={node} />;
-  }
-  return <SplitComponent node={node} />;
-};
-
 export const UGLayout: React.FC = () => {
   const { state } = useLayout();
-  
-  if (state.maximizedTileId) {
-    // Basic maximization implementation
-    // Ideally we'd find the node, but for MVP let's keep it simple
-  }
-
   return (
     <div className="ug-layout-root" style={{ width: '100%', height: '100%' }}>
       <LayoutNodeComponent node={state.root} />

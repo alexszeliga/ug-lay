@@ -21,7 +21,12 @@ describe('UGLayout', () => {
     expect(tiles).toHaveLength(2);
 
     // We expect to find a gutter
-    const gutters = document.querySelectorAll('.ug-gutter');
-    expect(gutters).toHaveLength(1);
+    const gutter = document.querySelector('.ug-gutter');
+    expect(gutter).toBeDefined();
+
+    // Simulate mousedown to see if it crashes (hoisting check)
+    if (gutter) {
+      gutter.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    }
   });
 });

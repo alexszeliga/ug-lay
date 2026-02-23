@@ -189,4 +189,14 @@ describe('LayoutEngine', () => {
     engine.setRatio(splitId, 0.9);
     expect((engine.getState().root as any).ratio).toBe(0.8);
   });
+
+  it('should return a new state reference when the state changes', () => {
+    const engine = new LayoutEngine();
+    const initialState = engine.getState();
+
+    engine.split(initialState.root.id, 'horizontal');
+    const newState = engine.getState();
+
+    expect(newState).not.toBe(initialState);
+  });
 });
