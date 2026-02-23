@@ -27,8 +27,11 @@ export interface LayoutState {
   root: LayoutNode;
 }
 
+export type Subscriber = (state: LayoutState) => void;
+
 export class LayoutEngine {
   private state: LayoutState;
+  private subscribers: Subscriber[] = [];
 
   constructor(initialState?: LayoutState) {
     this.state = initialState || {
@@ -39,20 +42,35 @@ export class LayoutEngine {
     };
   }
 
+  subscribe(callback: Subscriber): () => void {
+    this.subscribers.push(callback);
+    // Return an unsubscribe function
+    return () => {
+      this.subscribers = this.subscribers.filter(sub => sub !== callback);
+    };
+  }
+
+  private notify(): void {
+    this.subscribers.forEach(sub => sub(this.state));
+  }
+
   getState(): LayoutState {
     return this.state;
   }
 
   setRatio(splitId: string, ratio: number): void {
     this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio }, 'split');
+    this.notify();
   }
 
   updateTile(tileId: string, updates: Partial<Omit<TileNode, 'id' | 'type'>>): void {
     this.state.root = this.recursiveUpdate(this.state.root, tileId, updates, 'tile');
+    this.notify();
   }
 
   split(tileId: string, direction: Direction): void {
     this.state.root = this.recursiveSplit(this.state.root, tileId, direction);
+    this.notify();
   }
 
   private recursiveUpdate(

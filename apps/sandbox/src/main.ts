@@ -1,17 +1,16 @@
-import { LayoutEngine, LayoutNode } from '@ug-layout/core';
+import { LayoutEngine, LayoutNode, Direction } from '@ug-layout/core';
 
 const engine = new LayoutEngine();
 
-// Create a slightly complex initial layout to see the renderer in action
+// --- Initial Setup ---
 const rootId = engine.getState().root.id;
 engine.split(rootId, 'horizontal');
-
-const state = engine.getState();
-const leftChildId = (state.root as any).children[0].id;
-const rightChildId = (state.root as any).children[1].id;
-
+const leftChildId = (engine.getState().root as any).children[0].id;
+const rightChildId = (engine.getState().root as any).children[1].id;
 engine.split(leftChildId, 'vertical');
 engine.updateTile(rightChildId, { contentId: 'Sidebar' });
+// --------------------
+
 
 function renderNode(node: LayoutNode): HTMLElement {
   if (node.type === 'tile') {
@@ -22,6 +21,8 @@ function renderNode(node: LayoutNode): HTMLElement {
         <strong>Tile</strong><br/>
         <small>${node.id.substring(0, 8)}</small><br/>
         ${node.contentId ? `<span>[${node.contentId}]</span>` : ''}
+        <button data-action="split" data-id="${node.id}" data-direction="horizontal">Split H</button>
+        <button data-action="split" data-id="${node.id}" data-direction="vertical">Split V</button>
       </div>
     `;
     return el;
@@ -32,10 +33,10 @@ function renderNode(node: LayoutNode): HTMLElement {
   
   const r = node.ratio;
   if (node.direction === 'horizontal') {
-    el.style.gridTemplateColumns = `${r * 100}% ${ (1 - r) * 100}%`;
+    el.style.gridTemplateColumns = `${r * 100}% ${(1 - r) * 100}%`;
     el.style.gridTemplateRows = '100%';
   } else {
-    el.style.gridTemplateRows = `${r * 100}% ${ (1 - r) * 100}%`;
+    el.style.gridTemplateRows = `${r * 100}% ${(1 - r) * 100}%`;
     el.style.gridTemplateColumns = '100%';
   }
 
@@ -45,7 +46,30 @@ function renderNode(node: LayoutNode): HTMLElement {
   return el;
 }
 
-const app = document.getElementById('app');
-if (app) {
-  app.appendChild(renderNode(engine.getState().root));
+function updateDOM() {
+  const app = document.getElementById('app');
+  if (app) {
+    app.innerHTML = ''; // Clear existing DOM
+    const state = engine.getState(); // Get latest state
+    app.appendChild(renderNode(state.root));
+  }
 }
+
+// Attach event listeners to the body, using event delegation
+document.body.addEventListener('click', (event) => {
+  const target = event.target as HTMLButtonElement;
+  if (target.matches('button[data-action="split"]')) {
+    const id = target.dataset.id!;
+    const direction = target.dataset.direction! as Direction;
+    engine.split(id, direction); // The subscribe method will trigger the re-render
+  }
+});
+
+// --- Reactivity ---
+engine.subscribe(() => {
+  console.log('State updated, re-rendering...');
+  updateDOM();
+});
+
+// --- Initial Render ---
+updateDOM();

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { LayoutEngine } from './index';
+import { describe, it, expect, vi } from 'vitest';
+import { LayoutEngine, LayoutState } from './index';
 
 describe('LayoutEngine', () => {
   it('should initialize with a root tile', () => {
@@ -91,5 +91,18 @@ describe('LayoutEngine', () => {
 
     const state = engine.getState();
     expect((state.root as any).contentId).toBe('my-widget');
+  });
+
+  it('should notify subscribers when state changes', () => {
+    const engine = new LayoutEngine();
+    const subscriber = vi.fn();
+
+    engine.subscribe(subscriber);
+
+    // Any action that changes the state should trigger the subscriber
+    engine.split(engine.getState().root.id, 'horizontal');
+
+    expect(subscriber).toHaveBeenCalled();
+    expect(subscriber).toHaveBeenCalledWith(engine.getState());
   });
 });
