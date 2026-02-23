@@ -65,7 +65,7 @@ function updateDOM() {
 let dragState: {
   splitId: string;
   direction: Direction;
-  el: HTMLElement;
+  rect: DOMRect; // Store the rect on mousedown
 } | null = null;
 
 document.body.addEventListener('mousedown', (event) => {
@@ -75,7 +75,7 @@ document.body.addEventListener('mousedown', (event) => {
     dragState = {
       splitId: target.dataset.splitId!,
       direction: target.dataset.direction! as Direction,
-      el: target.parentElement!,
+      rect: target.parentElement!.getBoundingClientRect(), // Get rect ONLY once
     };
     document.body.classList.add('dragging');
     document.body.style.cursor = target.dataset.direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
@@ -84,12 +84,11 @@ document.body.addEventListener('mousedown', (event) => {
 
 document.body.addEventListener('mousemove', (event) => {
   if (!dragState) return;
-  const { splitId, direction, el } = dragState;
+  const { splitId, direction, rect } = dragState;
 
-  const rect = el.getBoundingClientRect();
-  const gutterSize = 4; // This should match the CSS
-  
+  const gutterSize = 4;
   let newRatio;
+
   if (direction === 'horizontal') {
     const mousePos = event.clientX;
     const elStart = rect.left;
@@ -102,17 +101,16 @@ document.body.addEventListener('mousemove', (event) => {
     newRatio = (mousePos - elStart - gutterSize / 2) / totalHeight;
   }
 
-  // Clamp ratio to prevent gutters from disappearing
   newRatio = Math.max(0.05, Math.min(0.95, newRatio));
-
   engine.setRatio(splitId, newRatio);
 });
 
 document.body.addEventListener('mouseup', () => {
   dragState = null;
   document.body.classList.remove('dragging');
-  document.body.style.cursor = ''; // Reset cursor
+  document.body.style.cursor = '';
 });
+
 
 // Attach event listeners to the body, using event delegation
 document.body.addEventListener('click', (event) => {
@@ -120,13 +118,12 @@ document.body.addEventListener('click', (event) => {
   if (target.matches('button[data-action="split"]')) {
     const id = target.dataset.id!;
     const direction = target.dataset.direction! as Direction;
-    engine.split(id, direction); // The subscribe method will trigger the re-render
+    engine.split(id, direction);
   }
 });
 
 // --- Reactivity ---
 engine.subscribe(() => {
-  // We could optimize this later by only updating the changed node
   updateDOM();
 });
 
