@@ -30,6 +30,13 @@ export interface LayoutEngineConfig {
   minRatio: number;
   maxRatio: number;
   defaultSplitRatio: number;
+  persistence?: PersistenceAdapter;
+  saveDebounceMs?: number;
+}
+
+export interface PersistenceAdapter {
+  save(state: LayoutState): Promise<void>;
+  load(): Promise<LayoutState | null>;
 }
 
 export type Subscriber = (state: LayoutState) => void;

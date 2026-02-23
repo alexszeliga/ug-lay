@@ -17,17 +17,20 @@ import {
 
 export * from './types';
 export { findNode } from './tree-utils';
+export { LocalStorageAdapter } from './adapters/LocalStorageAdapter';
 
 const DEFAULT_CONFIG: LayoutEngineConfig = {
   minRatio: 0.05,
   maxRatio: 0.95,
   defaultSplitRatio: 0.5,
+  saveDebounceMs: 500,
 };
 
 export class LayoutEngine {
   private state: LayoutState;
   private subscribers: Subscriber[] = [];
   private config: LayoutEngineConfig;
+  private saveTimer: any = null;
 
   constructor(initialState?: LayoutState, config?: Partial<LayoutEngineConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -50,6 +53,26 @@ export class LayoutEngine {
   private notify(): void {
     this.state = { ...this.state };
     this.subscribers.forEach((sub) => sub(this.state));
+    this.queueSave();
+  }
+
+  private queueSave(): void {
+    if (!this.config.persistence) return;
+
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer);
+    }
+
+    const delay = this.config.saveDebounceMs ?? 500;
+
+    if (delay === 0) {
+      this.config.persistence.save(this.state);
+    } else {
+      this.saveTimer = setTimeout(() => {
+        this.config.persistence?.save(this.state);
+        this.saveTimer = null;
+      }, delay);
+    }
   }
 
   getState(): LayoutState {
