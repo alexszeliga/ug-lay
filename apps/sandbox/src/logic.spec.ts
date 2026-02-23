@@ -24,4 +24,22 @@ describe('Sandbox Logic', () => {
 
     expect(focusAtTimeOfNotification).toBe(tileB);
   });
+
+  it('should only allow dragging from a specific handle selector', () => {
+    const engine = new LayoutEngine();
+    const state = new SandboxState(engine);
+    state.dragHandleSelector = '.drag-handle';
+
+    // Mock elements
+    const handleEl = { 
+      closest: (s: string) => s === '.drag-handle' ? { id: 'handle' } : null 
+    } as any;
+    
+    const contentEl = { 
+      closest: (s: string) => s === '.drag-handle' ? null : null 
+    } as any;
+
+    expect(state.canStartDrag(handleEl)).toBe(true);
+    expect(state.canStartDrag(contentEl)).toBe(false);
+  });
 });

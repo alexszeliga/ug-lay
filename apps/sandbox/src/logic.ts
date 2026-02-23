@@ -3,6 +3,7 @@ import { LayoutEngine } from '@ug-layout/core';
 export class SandboxState {
   focusedTileId: string | null = null;
   draggedTileId: string | null = null;
+  dragHandleSelector: string | null = null;
   engine: LayoutEngine;
 
   constructor(engine: LayoutEngine) {
@@ -10,9 +11,13 @@ export class SandboxState {
     this.focusedTileId = engine.getState().root.id;
   }
 
+  canStartDrag(el: HTMLElement): boolean {
+    if (!this.dragHandleSelector) return true;
+    return !!el.closest(this.dragHandleSelector);
+  }
+
   handleDrop(targetId: string) {
     if (this.draggedTileId && targetId !== this.draggedTileId) {
-      // FIX: Update focus BEFORE triggering the engine notification
       this.focusedTileId = targetId;
       this.engine.swapTiles(this.draggedTileId, targetId);
     }
