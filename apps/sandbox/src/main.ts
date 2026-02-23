@@ -63,6 +63,7 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
         <span style="opacity: 0.5;">${node.id.substring(0, 8)}</span>
         <span class="ug-tile-title">${componentInfo?.name || ''}</span>
         <div class="ug-controls">
+          <button class="ug-btn" data-action="reset" data-id="${node.id}" title="Reset">${SANDBOX_CONFIG.icons.reset}</button>
           <button class="ug-btn" data-action="maximize" data-id="${node.id}" title="Maximize">${SANDBOX_CONFIG.icons.maximize}</button>
           <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="horizontal" title="Split Horizontal">${SANDBOX_CONFIG.icons.splitH}</button>
           <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="vertical" title="Split Vertical">${SANDBOX_CONFIG.icons.splitV}</button>
@@ -142,6 +143,7 @@ document.body.addEventListener('click', (event) => {
 
   const { action, id, tileId, contentId, direction } = btn.dataset;
   if (action === 'select' && tileId && contentId) engine.updateTile(tileId, { contentId });
+  else if (action === 'reset' && id) engine.resetTile(id);
   else if (action === 'maximize' && id) engine.maximizeTile(id);
   else if (action === 'split' && id && direction) engine.split(id, direction as Direction);
   else if (action === 'remove' && id) engine.removeTile(id);

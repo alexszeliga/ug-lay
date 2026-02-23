@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TileNode } from '@ug-layout/core';
 import { useLayout } from '../context';
-import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE } from '../icons';
+import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET } from '../icons';
 import { ControlButton } from './ControlButton';
 import { DefaultPicker } from './DefaultPicker';
 
@@ -19,6 +19,7 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
     splitH: config?.icons?.splitH || ICON_SPLIT_H,
     splitV: config?.icons?.splitV || ICON_SPLIT_V,
     remove: config?.icons?.remove || ICON_REMOVE,
+    reset: config?.icons?.reset || ICON_RESET,
   };
 
   const onDragStart = (e: React.DragEvent) => {
@@ -69,6 +70,7 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
         <span style={{ opacity: 0.5 }}>{node.id.substring(0, 8)}</span>
         <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center' }}>{node.contentId || ''}</span>
         <div className="ug-controls" style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+          <ControlButton onClick={() => engine.resetTile(node.id)} title="Reset">{icons.reset}</ControlButton>
           <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{icons.maximize}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{icons.splitH}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'vertical')} title="Split Vertical">{icons.splitV}</ControlButton>

@@ -93,6 +93,16 @@ export class LayoutEngine {
     this.notify();
   }
 
+  resetTile(tileId: string): void {
+    this.state.root = recursiveUpdate(
+      this.state.root,
+      tileId,
+      { contentId: undefined, metadata: undefined },
+      'tile'
+    );
+    this.notify();
+  }
+
   removeTile(tileId: string): void {
     if (this.state.root.id === tileId && this.state.root.type === 'tile') {
       return;

@@ -144,4 +144,23 @@ describe('UGLayout', () => {
     expect(screen.getByTestId('custom-split-h')).toBeInTheDocument();
     expect(screen.getByTestId('custom-remove')).toBeInTheDocument();
   });
+
+  it('should reset a tile when the reset action is triggered', () => {
+    const engine = new LayoutEngine();
+    const rootId = engine.getState().root.id;
+    engine.updateTile(rootId, { contentId: 'test-widget' });
+    
+    const resetSpy = vi.spyOn(engine, 'resetTile');
+
+    render(
+      <LayoutProvider engine={engine} registry={{ 'test-widget': () => <div>Widget</div> }}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    const resetButton = screen.getByTitle(/Reset/i);
+    fireEvent.click(resetButton);
+
+    expect(resetSpy).toHaveBeenCalledWith(rootId);
+  });
 });

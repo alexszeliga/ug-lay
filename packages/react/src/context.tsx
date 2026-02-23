@@ -7,6 +7,7 @@ export interface LayoutConfig {
     splitV?: React.ReactNode;
     remove?: React.ReactNode;
     maximize?: React.ReactNode;
+    reset?: React.ReactNode;
   };
 }
 

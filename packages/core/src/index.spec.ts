@@ -199,4 +199,18 @@ describe('LayoutEngine', () => {
 
     expect(newState).not.toBe(initialState);
   });
+
+  it('should reset a tile by clearing its contentId and metadata', () => {
+    const engine = new LayoutEngine();
+    const rootId = engine.getState().root.id;
+    
+    engine.updateTile(rootId, { contentId: 'some-widget', metadata: { key: 'val' } });
+    expect((engine.getState().root as any).contentId).toBe('some-widget');
+
+    engine.resetTile(rootId);
+    
+    const state = engine.getState().root as any;
+    expect(state.contentId).toBeUndefined();
+    expect(state.metadata).toBeUndefined();
+  });
 });

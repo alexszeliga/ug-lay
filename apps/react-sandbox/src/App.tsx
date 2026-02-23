@@ -41,6 +41,7 @@ const CUSTOM_ICONS = {
   splitV: <span style={{ fontSize: '10px' }}>[V]</span>,
   remove: <span style={{ fontSize: '10px', fontWeight: 'bold' }}>[X]</span>,
   maximize: <span style={{ fontSize: '10px' }}>[M]</span>,
+  reset: <span style={{ fontSize: '10px' }}>[R]</span>,
 };
 
 export const App = () => {
