@@ -93,7 +93,8 @@ describe('UGLayout', () => {
     expect(header?.children[1]).toHaveTextContent('test-widget');
     
     // Section 3: Controls
-    expect(header?.children[2].classList.contains('ug-controls')).toBe(true);
+    const controls = header?.children[2];
+    expect(controls?.children).toHaveLength(5); // Reset, Maximize, SplitH, SplitV, Remove
   });
 
   it('should render a maximized overlay when a tile is maximized', () => {

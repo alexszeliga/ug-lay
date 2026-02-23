@@ -63,13 +63,13 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
         onDragStart={onDragStart}
         style={{ 
           background: 'var(--ug-header-bg, #333)', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
-          display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center',
+          display: 'grid', gridTemplateColumns: '80px 1fr 80px', alignItems: 'center',
           borderBottom: 'var(--ug-header-border-bottom, 1px solid #444)', color: 'var(--ug-header-text, #888)'
         }}
       >
-        <span style={{ opacity: 0.5 }}>{node.id.substring(0, 8)}</span>
-        <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center' }}>{node.contentId || ''}</span>
-        <div className="ug-controls" style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+        <span style={{ opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.id.substring(0, 8)}</span>
+        <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.contentId || ''}</span>
+        <div className="ug-controls" style={{ display: 'flex', gap: '2px', justifyContent: 'flex-end' }}>
           <ControlButton onClick={() => engine.resetTile(node.id)} title="Reset">{icons.reset}</ControlButton>
           <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{icons.maximize}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{icons.splitH}</ControlButton>
