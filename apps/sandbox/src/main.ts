@@ -190,7 +190,9 @@ document.body.addEventListener('drop', (event) => {
   const tile = target.closest('.ug-tile') as HTMLElement;
   
   if (tile && draggedTileId && tile.dataset.tileId !== draggedTileId) {
-    engine.swapTiles(draggedTileId, tile.dataset.tileId!);
+    const targetId = tile.dataset.tileId!;
+    engine.swapTiles(draggedTileId, targetId);
+    focusedTileId = targetId; // Set focus to the dropped-onto tile
   }
   
   draggedTileId = null;
