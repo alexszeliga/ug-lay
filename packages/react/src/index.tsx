@@ -104,7 +104,7 @@ const Gutter: React.FC<{ splitId: string; direction: Direction }> = ({ splitId, 
 };
 
 const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
-  const { registry, engine, setDraggedId, draggedId, state } = useLayout();
+  const { registry, engine, setDraggedId, draggedId } = useLayout();
   const [isOver, setIsOver] = useState(false);
   const Component = node.contentId && registry ? registry[node.contentId] : null;
 
@@ -129,7 +129,6 @@ const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
     setDraggedId(null);
   };
 
-  const isFocused = state.root.id === node.id || node.id === 'FIXME_FOCUS'; // Focus logic to be refined
   const borderStyle = isOver ? '2px solid #ffcc00' : '1px solid #444';
 
   return (
@@ -194,11 +193,52 @@ const SplitComponent: React.FC<{ node: SplitNode }> = ({ node }) => {
   );
 };
 
+const MaximizedOverlay: React.FC<{ node: TileNode }> = ({ node }) => {
+  const { engine, registry } = useLayout();
+  const Component = node.contentId && registry ? registry[node.contentId] : null;
+
+  return (
+    <div 
+      className="ug-maximized-overlay" 
+      style={{ 
+        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+        background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', flexDirection: 'column' 
+      }}
+    >
+      <div 
+        style={{ 
+          background: '#007acc', padding: '10px 20px', display: 'flex', 
+          justifyContent: 'space-between', alignSelf: 'stretch', alignItems: 'center' 
+        }}
+      >
+        <strong>Maximized View {node.contentId ? `- ${node.contentId}` : ''}</strong>
+        <ControlButton onClick={() => engine.minimize()} title="Close Maximized View">
+          {ICON_REMOVE}
+        </ControlButton>
+      </div>
+      <div style={{ flex: 1, padding: '40px' }}>
+        {Component ? <Component node={node} /> : <DefaultPicker tileId={node.id} />}
+      </div>
+    </div>
+  );
+};
+
+function findTile(node: LayoutNode, id: string): TileNode | null {
+  if (node.id === id && node.type === 'tile') return node;
+  if (node.type === 'split') {
+    return findTile(node.children[0], id) || findTile(node.children[1], id);
+  }
+  return null;
+}
+
 export const UGLayout: React.FC = () => {
   const { state } = useLayout();
+  const maximizedNode = state.maximizedTileId ? findTile(state.root, state.maximizedTileId) : null;
+
   return (
-    <div className="ug-layout-root" style={{ width: '100%', height: '100%' }}>
+    <div className="ug-layout-root" style={{ width: '100%', height: '100%', position: 'relative' }}>
       <LayoutNodeComponent node={state.root} />
+      {maximizedNode && <MaximizedOverlay node={maximizedNode} />}
     </div>
   );
 };

@@ -95,4 +95,25 @@ describe('UGLayout', () => {
     // Section 3: Controls
     expect(header?.children[2].classList.contains('ug-controls')).toBe(true);
   });
+
+  it('should render a maximized overlay when a tile is maximized', () => {
+    const engine = new LayoutEngine();
+    const tileId = engine.getState().root.id;
+    
+    render(
+      <LayoutProvider engine={engine}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    // Initial state: no overlay
+    expect(screen.queryByText(/Maximized View/i)).not.toBeInTheDocument();
+
+    // Act: Maximize
+    act(() => {
+      engine.maximizeTile(tileId);
+    });
+
+    expect(screen.getByText(/Maximized View/i)).toBeInTheDocument();
+  });
 });
