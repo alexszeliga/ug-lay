@@ -10,6 +10,8 @@ export interface BaseNode {
 
 export interface TileNode extends BaseNode {
   type: 'tile';
+  contentId?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface SplitNode extends BaseNode {
@@ -42,7 +44,11 @@ export class LayoutEngine {
   }
 
   setRatio(splitId: string, ratio: number): void {
-    this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio });
+    this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio }, 'split');
+  }
+
+  updateTile(tileId: string, updates: Partial<Omit<TileNode, 'id' | 'type'>>): void {
+    this.state.root = this.recursiveUpdate(this.state.root, tileId, updates, 'tile');
   }
 
   split(tileId: string, direction: Direction): void {
@@ -52,18 +58,22 @@ export class LayoutEngine {
   private recursiveUpdate(
     node: LayoutNode,
     id: string,
-    updates: Partial<SplitNode>
+    updates: any,
+    expectedType?: TileType
   ): LayoutNode {
     if (node.id === id) {
-      return { ...node, ...updates } as LayoutNode;
+      if (expectedType && node.type !== expectedType) {
+        return node;
+      }
+      return { ...node, ...updates };
     }
 
     if (node.type === 'split') {
       return {
         ...node,
         children: [
-          this.recursiveUpdate(node.children[0], id, updates),
-          this.recursiveUpdate(node.children[1], id, updates),
+          this.recursiveUpdate(node.children[0], id, updates, expectedType),
+          this.recursiveUpdate(node.children[1], id, updates, expectedType),
         ],
       };
     }

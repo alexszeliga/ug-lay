@@ -82,4 +82,14 @@ describe('LayoutEngine', () => {
     const engine = new LayoutEngine(initialState);
     expect(engine.getState()).toEqual(initialState);
   });
+
+  it('should allow setting content on a tile', () => {
+    const engine = new LayoutEngine();
+    const rootId = engine.getState().root.id;
+
+    engine.updateTile(rootId, { contentId: 'my-widget' });
+
+    const state = engine.getState();
+    expect((state.root as any).contentId).toBe('my-widget');
+  });
 });
