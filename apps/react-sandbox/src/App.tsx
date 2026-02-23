@@ -35,14 +35,6 @@ const registry = {
   'chat': CustomTile,
 };
 
-const CUSTOM_ICONS = {
-  splitH: <span style={{ fontSize: '10px' }}>[H]</span>,
-  splitV: <span style={{ fontSize: '10px' }}>[V]</span>,
-  remove: <span style={{ fontSize: '10px', fontWeight: 'bold' }}>[X]</span>,
-  maximize: <span style={{ fontSize: '10px' }}>[M]</span>,
-  reset: <span style={{ fontSize: '10px' }}>[R]</span>,
-};
-
 const storage = new LocalStorageAdapter('react-demo');
 
 export const App = () => {
@@ -71,7 +63,6 @@ export const App = () => {
     <LayoutProvider 
       engine={engine} 
       registry={registry}
-      config={{ icons: CUSTOM_ICONS }}
     >
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ padding: '10px 20px', background: '#333', borderBottom: '1px solid #444' }}>
