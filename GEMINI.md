@@ -3,9 +3,10 @@
 ## Metadata
 - **Initial Model:** Gemini 2.0 Flash
 - **Project Start:** Monday, February 23, 2026
-- **Current Status:** Full-Stack Ecosystem Complete. 
-  - Reactive Core Engine (TS)
-  - Themeable React Integration
+- **Current Status:** Full-Stack Ecosystem Hardened. 
+  - Reactive Core Engine (TS) with Generic Metadata Support
+  - Themeable React Integration with Strict Registry Types
+  - Storybook Documentation for React Components
   - PHP DTO & Validation Layer
   - Persistent Sandboxes (LocalStorage & PHP/SQLite)
 
@@ -18,7 +19,8 @@
 ## System Architecture
 The layout is managed as a **Recursive Binary Tree**.
 - **Nodes:** Either a `Tile` (Leaf) or a `Split` (Branch).
-- **State Machine:** Pure logic in `@ug-layout/core` handles tree transformations (split, remove, swap, resize, maximize, reset).
+- **State Machine:** Pure logic in `@ug-layout/core` handles tree transformations.
+- **Type Safety:** High-level generics allow users to type their own `TMetadata`.
 - **Reactivity:** Pub-Sub implementation allows any renderer to subscribe to state changes.
 - **Persistence:** Plug-and-play Adapter pattern (LocalStorage, HTTP) with built-in debouncing.
-- **Backend:** PHP DTO layer ensures type-safe persistence and validation for PHP-based frameworks (Laravel/Symfony).
+- **Backend:** PHP DTO layer ensures type-safe persistence and validation.

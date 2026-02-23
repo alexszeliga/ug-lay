@@ -7,37 +7,31 @@
 ---
 
 ## Session 1: Foundation & Core Logic
-*(See previous entries for Monorepo, Splitting, Reactivity, and Basic Sandbox details)*
-
-### 10. Refactor: Core & React Modularization
-- **Objective:** Improve DX by breaking down monolith files.
-- **Action:** Extracted `tree-utils.ts` from Core and divided React into specialized components (`Gutter`, `Tile`, `Split`, `context`).
-- **Outcome:** cleaner codebase with 100% test coverage preserved.
-
-### 11. Feature: Themeability (Headless but Pre-styled)
-- **Objective:** Allow developers to skin the UI without fighting inline styles.
-- **Implementation:** Refactored React package to use **CSS Variables** (`--ug-tile-bg`, etc.) with sensible fallbacks.
-- **Verification:** Updated React Sandbox to demonstrate a "darker" theme via root variables.
-
-### 12. Feature: Persistence Engine (Adapter Pattern)
-- **Objective:** Support LocalStorage and Database syncing.
-- **Architecture:** Implemented `PersistenceAdapter` interface in Core. 
-- **TDD:** Added debouncing logic (500ms default) to prevent database hammering during drags.
-- **Adapters:** Built `LocalStorageAdapter` and `HttpPersistenceAdapter`.
-
-### 13. Feature: PHP DTO & Validation Layer
-- **Objective:** Server-side parity for PHP frameworks.
-- **Implementation:** Created `ug-layout/php` library with recursive DTOs (`LayoutState`, `SplitNode`, `TileNode`).
-- **Laravel Ready:** Included a `Layout` Eloquent model and Service Provider.
-
-### 14. Feature: Content Switching & Reset
-- **Objective:** Allow users to change component types or return to the picker.
-- **Action:** Added `engine.resetTile(id)` to Core and a "Reset" icon button to the standardized headers.
-
-### 15. The PHP Sandbox (Full Stack Proof)
-- **Objective:** Demonstrate end-to-end persistence via a PHP backend.
-- **Outcome:** Built `apps/php-sandbox` using Vite (frontend) + Native PHP (API). Verified that layouts save to `layout.json` and persist across refreshes.
+*(Summary: Monorepo setup, Tree transformations, React/Vanilla integrations, and PHP Persistence.)*
 
 ---
-**Current Version:** 0.1.0 (Development)  
-**Status:** Feature Complete for MVP.
+
+## Session 2: Hardening & DX
+
+### 16. Feature: Core Type Hardening (Generics)
+- **Objective:** Provide autocompletion for user-defined tile data.
+- **Action:** Refactored `LayoutEngine` and all node types to be generic over `TMetadata`.
+- **Outcome:** Strictly typed `node.metadata` throughout the entire ecosystem.
+
+### 17. Feature: React Registry Safety
+- **Objective:** Ensure developers pass compatible components to the layout.
+- **Action:** Defined `TileComponentProps<TMetadata>` and enforced it in the `ComponentRegistry` type.
+- **Outcome:** IDE now provides autocompletion for engine and node props inside custom widgets.
+
+### 18. Feature: Storybook Integration
+- **Objective:** Visually document components and themeable states.
+- **Implementation:** Configured Storybook with Vite aliases to source local packages.
+- **Stories:** Created `Default`, `ComplexLayout`, and `CustomTheme` scenarios.
+- **Visual Fix:** Resolved header "squishing" by using a fixed-width grid (`80px 1fr 80px`).
+
+### 19. Feature: Documentation Infrastructure
+- **Action:** Created stub READMEs for all packages and stashed them (`readme-stubs`) for user-led authoring.
+
+---
+**Current Version:** 0.2.0 (Hardened)  
+**Status:** Ready for Advanced Features (Tabs/Floating) or Backend Expansion.
