@@ -92,11 +92,11 @@ export const CustomTheme: Story = {
         height: '500px', 
         border: '1px solid #444',
         '--ug-tile-bg': '#f9f9f9',
-        --ug-header-bg: '#eee',
-        --ug-header-text: '#666',
-        --ug-header-title: '#007acc',
-        --ug-gutter-bg: '#007acc',
-        --ug-tile-border: '1px solid #ddd'
+        '--ug-header-bg': '#eee',
+        '--ug-header-text': '#666',
+        '--ug-header-title': '#007acc',
+        '--ug-gutter-bg': '#007acc',
+        '--ug-tile-border': '1px solid #ddd'
       } as React.CSSProperties}>
         <LayoutProvider engine={engine} registry={registry}>
           <UGLayout />
