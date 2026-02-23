@@ -15,13 +15,16 @@ engine.updateTile(rightChildId, { contentId: 'Sidebar' });
 // --------------------
 
 
-function renderNode(node: LayoutNode): HTMLElement {
+function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
   if (node.type === 'tile') {
     const el = document.createElement('div');
     el.className = 'ug-tile';
-    el.dataset.tileId = node.id; // Add ID for click handling
+    el.dataset.tileId = node.id;
     if (node.id === focusedTileId) {
       el.classList.add('focused');
+    }
+    if (isRoot) {
+      el.classList.add('is-root');
     }
     el.innerHTML = `
       <div>
@@ -65,7 +68,7 @@ function updateDOM() {
   if (app) {
     app.innerHTML = ''; // Clear existing DOM
     const state = engine.getState(); // Get latest state
-    app.appendChild(renderNode(state.root));
+    app.appendChild(renderNode(state.root, true)); // Pass true for the root node
   }
 }
 
