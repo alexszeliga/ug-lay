@@ -78,7 +78,6 @@ document.body.addEventListener('mousedown', (event) => {
       el: target.parentElement!,
     };
     document.body.classList.add('dragging');
-    // Set the cursor on the body to match the gutter direction
     document.body.style.cursor = target.dataset.direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
   }
 });
@@ -88,16 +87,19 @@ document.body.addEventListener('mousemove', (event) => {
   const { splitId, direction, el } = dragState;
 
   const rect = el.getBoundingClientRect();
+  const gutterSize = 4; // This should match the CSS
   
   let newRatio;
   if (direction === 'horizontal') {
     const mousePos = event.clientX;
     const elStart = rect.left;
-    newRatio = (mousePos - elStart) / rect.width;
+    const totalWidth = rect.width - gutterSize;
+    newRatio = (mousePos - elStart - gutterSize / 2) / totalWidth;
   } else {
     const mousePos = event.clientY;
     const elStart = rect.top;
-    newRatio = (mousePos - elStart) / rect.height;
+    const totalHeight = rect.height - gutterSize;
+    newRatio = (mousePos - elStart - gutterSize / 2) / totalHeight;
   }
 
   // Clamp ratio to prevent gutters from disappearing
@@ -112,15 +114,6 @@ document.body.addEventListener('mouseup', () => {
   document.body.style.cursor = ''; // Reset cursor
 });
 
-// Helper to find a node in the tree (no longer needed for this logic but good to have)
-function findNode(node: LayoutNode, id: string): LayoutNode | null {
-  if (node.id === id) return node;
-  if (node.type === 'split') {
-    return findNode(node.children[0], id) || findNode(node.children[1], id);
-  }
-  return null;
-}
-
 // Attach event listeners to the body, using event delegation
 document.body.addEventListener('click', (event) => {
   const target = event.target as HTMLButtonElement;
@@ -133,7 +126,7 @@ document.body.addEventListener('click', (event) => {
 
 // --- Reactivity ---
 engine.subscribe(() => {
-  console.log('State updated, re-rendering...');
+  // We could optimize this later by only updating the changed node
   updateDOM();
 });
 
