@@ -65,7 +65,6 @@ function updateDOM() {
 let dragState: {
   splitId: string;
   direction: Direction;
-  startPos: number;
   el: HTMLElement;
 } | null = null;
 
@@ -76,35 +75,32 @@ document.body.addEventListener('mousedown', (event) => {
     dragState = {
       splitId: target.dataset.splitId!,
       direction: target.dataset.direction! as Direction,
-      startPos:
-        target.dataset.direction === 'horizontal'
-          ? event.clientX
-          : event.clientY,
       el: target.parentElement!,
     };
     document.body.classList.add('dragging');
+    // Set the cursor on the body to match the gutter direction
+    document.body.style.cursor = target.dataset.direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
   }
 });
 
 document.body.addEventListener('mousemove', (event) => {
   if (!dragState) return;
-  const { splitId, direction, startPos, el } = dragState;
+  const { splitId, direction, el } = dragState;
 
-  const currentPos = direction === 'horizontal' ? event.clientX : event.clientY;
-  const delta = currentPos - startPos;
-  
   const rect = el.getBoundingClientRect();
-  const totalSize = direction === 'horizontal' ? rect.width : rect.height;
-
-  // Find the current ratio
-  const currentNode = findNode(engine.getState().root, splitId) as any;
-  if (!currentNode) return;
   
-  const currentRatioInPixels = totalSize * currentNode.ratio;
-  const newRatioInPixels = currentRatioInPixels + delta;
-  let newRatio = newRatioInPixels / totalSize;
+  let newRatio;
+  if (direction === 'horizontal') {
+    const mousePos = event.clientX;
+    const elStart = rect.left;
+    newRatio = (mousePos - elStart) / rect.width;
+  } else {
+    const mousePos = event.clientY;
+    const elStart = rect.top;
+    newRatio = (mousePos - elStart) / rect.height;
+  }
 
-  // Clamp ratio
+  // Clamp ratio to prevent gutters from disappearing
   newRatio = Math.max(0.05, Math.min(0.95, newRatio));
 
   engine.setRatio(splitId, newRatio);
@@ -113,10 +109,10 @@ document.body.addEventListener('mousemove', (event) => {
 document.body.addEventListener('mouseup', () => {
   dragState = null;
   document.body.classList.remove('dragging');
+  document.body.style.cursor = ''; // Reset cursor
 });
 
-
-// Helper to find a node in the tree
+// Helper to find a node in the tree (no longer needed for this logic but good to have)
 function findNode(node: LayoutNode, id: string): LayoutNode | null {
   if (node.id === id) return node;
   if (node.type === 'split') {
