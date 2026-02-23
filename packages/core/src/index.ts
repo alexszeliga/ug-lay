@@ -78,9 +78,35 @@ export class LayoutEngine {
     this.notify();
   }
 
+  swapTiles(sourceId: string, targetId: string): void {
+    const sourceNode = this.findNode(this.state.root, sourceId) as TileNode;
+    const targetNode = this.findNode(this.state.root, targetId) as TileNode;
+
+    if (!sourceNode || !targetNode || sourceNode.type !== 'tile' || targetNode.type !== 'tile') {
+      console.warn('Both source and target must be tiles to swap.');
+      return;
+    }
+
+    const { contentId: sourceContent, metadata: sourceMeta } = sourceNode;
+    const { contentId: targetContent, metadata: targetMeta } = targetNode;
+    
+    this.state.root = this.recursiveUpdate(this.state.root, sourceId, { contentId: targetContent, metadata: targetMeta }, 'tile');
+    this.state.root = this.recursiveUpdate(this.state.root, targetId, { contentId: sourceContent, metadata: sourceMeta }, 'tile');
+    
+    this.notify();
+  }
+
   split(tileId: string, direction: Direction): void {
     this.state.root = this.recursiveSplit(this.state.root, tileId, direction);
     this.notify();
+  }
+
+  private findNode(node: LayoutNode, id: string): LayoutNode | null {
+    if (node.id === id) return node;
+    if (node.type === 'split') {
+      return this.findNode(node.children[0], id) || this.findNode(node.children[1], id);
+    }
+    return null;
   }
 
   private recursiveUpdate(

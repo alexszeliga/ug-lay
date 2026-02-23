@@ -2,6 +2,7 @@ import { LayoutEngine, LayoutNode, Direction } from '@ug-layout/core';
 
 // --- State Management ---
 let focusedTileId: string | null = null;
+let draggedTileId: string | null = null;
 const engine = new LayoutEngine();
 
 // --- Initial Setup ---
@@ -11,6 +12,7 @@ engine.split(rootId, 'horizontal');
 const leftChildId = (engine.getState().root as any).children[0].id;
 const rightChildId = (engine.getState().root as any).children[1].id;
 engine.split(leftChildId, 'vertical');
+engine.updateTile(leftChildId, { contentId: 'Left Top' });
 engine.updateTile(rightChildId, { contentId: 'Sidebar' });
 // --------------------
 
@@ -19,6 +21,7 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
   if (node.type === 'tile') {
     const el = document.createElement('div');
     el.className = 'ug-tile';
+    el.draggable = true;
     el.dataset.tileId = node.id;
     if (node.id === focusedTileId) {
       el.classList.add('focused');
@@ -68,15 +71,15 @@ function updateDOM() {
   if (app) {
     app.innerHTML = ''; // Clear existing DOM
     const state = engine.getState(); // Get latest state
-    app.appendChild(renderNode(state.root, true)); // Pass true for the root node
+    app.appendChild(renderNode(state.root, true));
   }
 }
 
-// --- Dragging Logic ---
+// --- Drag-to-Resize Logic ---
 let dragState: {
   splitId: string;
   direction: Direction;
-  rect: DOMRect; // Store the rect on mousedown
+  rect: DOMRect;
 } | null = null;
 
 document.body.addEventListener('mousedown', (event) => {
@@ -86,7 +89,7 @@ document.body.addEventListener('mousedown', (event) => {
     dragState = {
       splitId: target.dataset.splitId!,
       direction: target.dataset.direction! as Direction,
-      rect: target.parentElement!.getBoundingClientRect(), // Get rect ONLY once
+      rect: target.parentElement!.getBoundingClientRect(),
     };
     document.body.classList.add('dragging');
     document.body.style.cursor = target.dataset.direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
@@ -96,22 +99,13 @@ document.body.addEventListener('mousedown', (event) => {
 document.body.addEventListener('mousemove', (event) => {
   if (!dragState) return;
   const { splitId, direction, rect } = dragState;
-
   const gutterSize = 4;
   let newRatio;
-
   if (direction === 'horizontal') {
-    const mousePos = event.clientX;
-    const elStart = rect.left;
-    const totalWidth = rect.width - gutterSize;
-    newRatio = (mousePos - elStart - gutterSize / 2) / totalWidth;
+    newRatio = (event.clientX - rect.left - gutterSize / 2) / (rect.width - gutterSize);
   } else {
-    const mousePos = event.clientY;
-    const elStart = rect.top;
-    const totalHeight = rect.height - gutterSize;
-    newRatio = (mousePos - elStart - gutterSize / 2) / totalHeight;
+    newRatio = (event.clientY - rect.top - gutterSize / 2) / (rect.height - gutterSize);
   }
-
   newRatio = Math.max(0.05, Math.min(0.95, newRatio));
   engine.setRatio(splitId, newRatio);
 });
@@ -126,13 +120,11 @@ document.body.addEventListener('mouseup', () => {
 // --- Input Handling ---
 document.body.addEventListener('click', (event) => {
   const target = event.target as HTMLElement;
-
   const tileElement = target.closest('.ug-tile');
   if (tileElement instanceof HTMLElement && tileElement.dataset.tileId) {
     focusedTileId = tileElement.dataset.tileId;
-    updateDOM(); // Manually update focus without waiting for engine
+    updateDOM();
   }
-
   if (target instanceof HTMLButtonElement) {
     const { action, id, direction } = target.dataset;
     if (action === 'split' && id && direction) {
@@ -145,30 +137,66 @@ document.body.addEventListener('click', (event) => {
 
 document.addEventListener('keydown', (event) => {
   if (!focusedTileId) return;
-
-  // Using ctrlKey for cross-platform (maps to Cmd on Mac)
   if (event.ctrlKey && event.key === 'd') {
     event.preventDefault();
     engine.split(focusedTileId, 'horizontal');
   }
-
   if (event.ctrlKey && event.key === 'v') {
     event.preventDefault();
     engine.split(focusedTileId, 'vertical');
   }
-
   if (event.ctrlKey && event.key === 'x') {
     event.preventDefault();
     engine.removeTile(focusedTileId);
-    // Find a new tile to focus
     const state = engine.getState();
-    if (state.root.type === 'tile') {
-      focusedTileId = state.root.id;
-    } else {
-      focusedTileId = (state.root as any).children[0].id;
-    }
+    focusedTileId = state.root.type === 'tile' ? state.root.id : (state.root as any).children[0].id;
   }
 });
+
+// --- Drag-to-Swap Logic ---
+document.body.addEventListener('dragstart', (event) => {
+  const target = event.target as HTMLElement;
+  const tile = target.closest('.ug-tile') as HTMLElement;
+  if (tile) {
+    draggedTileId = tile.dataset.tileId!;
+    event.dataTransfer?.setData('text/plain', draggedTileId);
+  }
+});
+
+document.body.addEventListener('dragover', (event) => {
+  event.preventDefault(); // Required to allow drop
+  const target = event.target as HTMLElement;
+  const tile = target.closest('.ug-tile') as HTMLElement;
+  
+  // Clear other highlights
+  document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
+  
+  if (tile && tile.dataset.tileId !== draggedTileId) {
+    tile.classList.add('drag-over');
+  }
+});
+
+document.body.addEventListener('dragleave', (event) => {
+  const target = event.target as HTMLElement;
+  const tile = target.closest('.ug-tile') as HTMLElement;
+  if (tile) {
+    tile.classList.remove('drag-over');
+  }
+});
+
+document.body.addEventListener('drop', (event) => {
+  event.preventDefault();
+  const target = event.target as HTMLElement;
+  const tile = target.closest('.ug-tile') as HTMLElement;
+  
+  if (tile && draggedTileId && tile.dataset.tileId !== draggedTileId) {
+    engine.swapTiles(draggedTileId, tile.dataset.tileId!);
+  }
+  
+  draggedTileId = null;
+  document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
+});
+
 
 // --- Reactivity ---
 engine.subscribe(() => {
