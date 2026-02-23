@@ -56,9 +56,12 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
     if (node.id === sandbox.focusedTileId) el.classList.add('focused');
     if (isRoot) el.classList.add('is-root');
 
+    const componentInfo = node.contentId ? REGISTRY[node.contentId] : null;
+
     el.innerHTML = `
       <div class="ug-tile-header" draggable="true">
-        <span>${node.id.substring(0, 8)}</span>
+        <span style="opacity: 0.5;">${node.id.substring(0, 8)}</span>
+        <span class="ug-tile-title">${componentInfo?.name || ''}</span>
         <div class="ug-controls">
           <button class="ug-btn" data-action="maximize" data-id="${node.id}" title="Maximize">${SANDBOX_CONFIG.icons.maximize}</button>
           <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="horizontal" title="Split Horizontal">${SANDBOX_CONFIG.icons.splitH}</button>

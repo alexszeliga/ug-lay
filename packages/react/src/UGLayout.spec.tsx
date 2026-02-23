@@ -66,4 +66,33 @@ describe('UGLayout', () => {
 
     expect(swapSpy).toHaveBeenCalledWith(idA, idB);
   });
+
+  it('should have a header with three sections: ID, Title, and Controls', () => {
+    const engine = new LayoutEngine();
+    engine.updateTile(engine.getState().root.id, { contentId: 'test-widget' });
+    
+    // We pass a registry so we can check for the title
+    const registry = { 'test-widget': () => <div>Widget</div> };
+
+    render(
+      <LayoutProvider engine={engine} registry={registry}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    const header = document.querySelector('.ug-tile-header');
+    expect(header).toBeDefined();
+    
+    // Check for 3 sections
+    expect(header?.children).toHaveLength(3);
+    
+    // Section 1: ID
+    expect(header?.children[0]).toHaveTextContent(engine.getState().root.id.substring(0, 8));
+    
+    // Section 2: Title (should be test-widget since we don't have a name map in core)
+    expect(header?.children[1]).toHaveTextContent('test-widget');
+    
+    // Section 3: Controls
+    expect(header?.children[2].classList.contains('ug-controls')).toBe(true);
+  });
 });

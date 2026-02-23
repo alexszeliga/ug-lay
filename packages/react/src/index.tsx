@@ -43,14 +43,33 @@ export const useLayout = (): LayoutContextValue => {
   return context;
 };
 
+// --- Internal Components ---
+
+const ICON_SPLIT_H = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>;
+const ICON_SPLIT_V = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: 'rotate(90deg)' }}><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>;
+const ICON_REMOVE = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>;
+const ICON_MAXIMIZE = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>;
+
+const ControlButton: React.FC<{ onClick: () => void; title: string; children: React.ReactNode; color?: string }> = ({ onClick, title, children, color }) => (
+  <button 
+    onClick={(e) => { e.stopPropagation(); onClick(); }} 
+    title={title}
+    style={{ border: 'none', background: 'none', color: color || 'inherit', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.7 }}
+    onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+    onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+  >
+    {children}
+  </button>
+);
+
 const DefaultPicker: React.FC<{ tileId: string }> = ({ tileId }) => {
   const { engine, registry } = useLayout();
-  if (!registry) return <div>Select a Component (No Registry)</div>;
+  if (!registry) return <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Select a Component (No Registry)</div>;
   return (
     <div className="ug-picker" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '10px' }}>
-      <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginBottom: '4px' }}>Select a Component</div>
+      <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginBottom: '4px', fontSize: '12px' }}>Select a Component</div>
       {Object.keys(registry).map((id) => (
-        <button key={id} onClick={() => engine.updateTile(tileId, { contentId: id })} style={{ padding: '8px', cursor: 'pointer' }}>{id}</button>
+        <button key={id} onClick={() => engine.updateTile(tileId, { contentId: id })} style={{ padding: '8px', cursor: 'pointer', background: '#444', color: 'white', border: '1px solid #555', borderRadius: '4px' }}>{id}</button>
       ))}
     </div>
   );
@@ -85,7 +104,7 @@ const Gutter: React.FC<{ splitId: string; direction: Direction }> = ({ splitId, 
 };
 
 const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
-  const { registry, engine, setDraggedId, draggedId } = useLayout();
+  const { registry, engine, setDraggedId, draggedId, state } = useLayout();
   const [isOver, setIsOver] = useState(false);
   const Component = node.contentId && registry ? registry[node.contentId] : null;
 
@@ -110,6 +129,7 @@ const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
     setDraggedId(null);
   };
 
+  const isFocused = state.root.id === node.id || node.id === 'FIXME_FOCUS'; // Focus logic to be refined
   const borderStyle = isOver ? '2px solid #ffcc00' : '1px solid #444';
 
   return (
@@ -120,21 +140,30 @@ const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
       onDrop={onDrop}
       style={{ 
         width: '100%', height: '100%', display: 'flex', flexDirection: 'column', 
-        boxSizing: 'border-box', border: borderStyle, overflow: 'hidden' 
+        boxSizing: 'border-box', border: borderStyle, overflow: 'hidden',
+        backgroundColor: '#2a2a2a'
       }}
     >
       <div 
         className="ug-tile-header" 
         draggable 
         onDragStart={onDragStart}
-        style={{ background: '#333', padding: '4px 8px', cursor: 'grab', fontSize: '10px', display: 'flex', justifyContent: 'space-between' }}
+        style={{ 
+          background: '#333', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
+          display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center',
+          borderBottom: '1px solid #444', color: '#888'
+        }}
       >
-        <span>{node.id.substring(0, 8)}</span>
-        <div>
-          <button onClick={() => engine.removeTile(node.id)} style={{ color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>×</button>
+        <span style={{ opacity: 0.5 }}>{node.id.substring(0, 8)}</span>
+        <span style={{ fontWeight: 'bold', color: '#ccc', textAlign: 'center' }}>{node.contentId || ''}</span>
+        <div className="ug-controls" style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+          <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{ICON_MAXIMIZE}</ControlButton>
+          <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{ICON_SPLIT_H}</ControlButton>
+          <ControlButton onClick={() => engine.split(node.id, 'vertical')} title="Split Vertical">{ICON_SPLIT_V}</ControlButton>
+          <ControlButton onClick={() => engine.removeTile(node.id)} title="Remove" color="#ff4d4d">{ICON_REMOVE}</ControlButton>
         </div>
       </div>
-      <div style={{ flex: 1, position: 'relative' }}>
+      <div className="ug-tile-content" style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {Component ? <Component node={node} /> : <DefaultPicker tileId={node.id} />}
       </div>
     </div>
