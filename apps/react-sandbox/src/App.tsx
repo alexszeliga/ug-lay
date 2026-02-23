@@ -35,19 +35,30 @@ const registry = {
   'chat': CustomTile,
 };
 
+// --- Custom Icons ---
+const CUSTOM_ICONS = {
+  splitH: <span style={{ fontSize: '10px' }}>[H]</span>,
+  splitV: <span style={{ fontSize: '10px' }}>[V]</span>,
+  remove: <span style={{ fontSize: '10px', fontWeight: 'bold' }}>[X]</span>,
+  maximize: <span style={{ fontSize: '10px' }}>[M]</span>,
+};
+
 export const App = () => {
   const engine = useMemo(() => {
     const e = new LayoutEngine();
     const rootId = e.getState().root.id;
     e.split(rootId, 'horizontal');
-    const state = e.getState();
-    const leftId = (state.root as any).children[0].id;
+    const leftId = (e.getState().root as any).children[0].id;
     e.updateTile(leftId, { contentId: 'analytics' });
     return e;
   }, []);
 
   return (
-    <LayoutProvider engine={engine} registry={registry}>
+    <LayoutProvider 
+      engine={engine} 
+      registry={registry}
+      config={{ icons: CUSTOM_ICONS }}
+    >
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ padding: '10px 20px', background: '#333', borderBottom: '1px solid #444' }}>
           <strong>ug-layout / react-sandbox</strong>

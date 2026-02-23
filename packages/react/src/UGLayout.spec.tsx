@@ -128,4 +128,20 @@ describe('UGLayout', () => {
     // We check if the style attribute contains the variable reference
     expect(tile.style.backgroundColor).toContain('var(--ug-tile-bg');
   });
+
+  it('should render custom icons when provided in the config', () => {
+    const customIcons = {
+      splitH: <span data-testid="custom-split-h">SH</span>,
+      remove: <span data-testid="custom-remove">RM</span>,
+    };
+
+    render(
+      <LayoutProvider engine={new LayoutEngine()} config={{ icons: customIcons }}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    expect(screen.getByTestId('custom-split-h')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-remove')).toBeInTheDocument();
+  });
 });

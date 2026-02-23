@@ -10,9 +10,16 @@ export interface TileComponentProps {
 }
 
 export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
-  const { registry, engine, setDraggedId, draggedId } = useLayout();
+  const { registry, engine, setDraggedId, draggedId, config } = useLayout();
   const [isOver, setIsOver] = useState(false);
   const Component = node.contentId && registry ? registry[node.contentId] : null;
+
+  const icons = {
+    maximize: config?.icons?.maximize || ICON_MAXIMIZE,
+    splitH: config?.icons?.splitH || ICON_SPLIT_H,
+    splitV: config?.icons?.splitV || ICON_SPLIT_V,
+    remove: config?.icons?.remove || ICON_REMOVE,
+  };
 
   const onDragStart = (e: React.DragEvent) => {
     setDraggedId(node.id);
@@ -62,10 +69,10 @@ export const TileComponent: React.FC<TileComponentProps> = ({ node }) => {
         <span style={{ opacity: 0.5 }}>{node.id.substring(0, 8)}</span>
         <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center' }}>{node.contentId || ''}</span>
         <div className="ug-controls" style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-          <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{ICON_MAXIMIZE}</ControlButton>
-          <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{ICON_SPLIT_H}</ControlButton>
-          <ControlButton onClick={() => engine.split(node.id, 'vertical')} title="Split Vertical">{ICON_SPLIT_V}</ControlButton>
-          <ControlButton onClick={() => engine.removeTile(node.id)} title="Remove" color="#ff4d4d">{ICON_REMOVE}</ControlButton>
+          <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{icons.maximize}</ControlButton>
+          <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{icons.splitH}</ControlButton>
+          <ControlButton onClick={() => engine.split(node.id, 'vertical')} title="Split Vertical">{icons.splitV}</ControlButton>
+          <ControlButton onClick={() => engine.removeTile(node.id)} title="Remove" color="#ff4d4d">{icons.remove}</ControlButton>
         </div>
       </div>
       <div className="ug-tile-content" style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

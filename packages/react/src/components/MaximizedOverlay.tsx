@@ -10,8 +10,12 @@ export interface MaximizedOverlayProps {
 }
 
 export const MaximizedOverlay: React.FC<MaximizedOverlayProps> = ({ node }) => {
-  const { engine, registry } = useLayout();
+  const { engine, registry, config } = useLayout();
   const Component = node.contentId && registry ? registry[node.contentId] : null;
+
+  const icons = {
+    remove: config?.icons?.remove || ICON_REMOVE,
+  };
 
   return (
     <div 
@@ -29,7 +33,7 @@ export const MaximizedOverlay: React.FC<MaximizedOverlayProps> = ({ node }) => {
       >
         <strong style={{ color: 'white' }}>Maximized View {node.contentId ? `- ${node.contentId}` : ''}</strong>
         <ControlButton onClick={() => engine.minimize()} title="Close Maximized View">
-          {ICON_REMOVE}
+          {icons.remove}
         </ControlButton>
       </div>
       <div style={{ flex: 1, padding: '40px' }}>
