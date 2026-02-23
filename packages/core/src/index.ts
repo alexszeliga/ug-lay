@@ -25,6 +25,7 @@ export type LayoutNode = TileNode | SplitNode;
 
 export interface LayoutState {
   root: LayoutNode;
+  maximizedTileId: string | null;
 }
 
 export type Subscriber = (state: LayoutState) => void;
@@ -39,6 +40,7 @@ export class LayoutEngine {
         id: uuidv4(),
         type: 'tile',
       },
+      maximizedTileId: null,
     };
   }
 
@@ -55,6 +57,16 @@ export class LayoutEngine {
 
   getState(): LayoutState {
     return this.state;
+  }
+
+  maximizeTile(tileId: string): void {
+    this.state.maximizedTileId = tileId;
+    this.notify();
+  }
+
+  minimize(): void {
+    this.state.maximizedTileId = null;
+    this.notify();
   }
 
   setRatio(splitId: string, ratio: number): void {

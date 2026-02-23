@@ -140,4 +140,15 @@ describe('LayoutEngine', () => {
     expect(finalRoot.children[0].type).toBe('tile'); // D is now the first child
     expect(finalRoot.children.length).toBe(2);
   });
+
+  it('should allow maximizing and minimizing a tile', () => {
+    const engine = new LayoutEngine();
+    const tileId = engine.getState().root.id;
+
+    engine.maximizeTile(tileId);
+    expect(engine.getState().maximizedTileId).toBe(tileId);
+
+    engine.minimize();
+    expect(engine.getState().maximizedTileId).toBeNull();
+  });
 });
