@@ -1,14 +1,28 @@
 import { v4 as uuidv4 } from 'uuid';
 
+export type Direction = 'horizontal' | 'vertical';
 export type TileType = 'tile' | 'split';
 
-export interface Tile {
+export interface BaseNode {
   id: string;
   type: TileType;
 }
 
+export interface TileNode extends BaseNode {
+  type: 'tile';
+}
+
+export interface SplitNode extends BaseNode {
+  type: 'split';
+  direction: Direction;
+  ratio: number;
+  children: [LayoutNode, LayoutNode];
+}
+
+export type LayoutNode = TileNode | SplitNode;
+
 export interface LayoutState {
-  root: Tile;
+  root: LayoutNode;
 }
 
 export class LayoutEngine {
@@ -17,7 +31,7 @@ export class LayoutEngine {
   constructor() {
     this.state = {
       root: {
-        id: 'root', // Static for now, will use uuid later if needed
+        id: uuidv4(),
         type: 'tile',
       },
     };
@@ -25,5 +39,39 @@ export class LayoutEngine {
 
   getState(): LayoutState {
     return this.state;
+  }
+
+  split(tileId: string, direction: Direction): void {
+    this.state.root = this.recursiveSplit(this.state.root, tileId, direction);
+  }
+
+  private recursiveSplit(
+    node: LayoutNode,
+    tileId: string,
+    direction: Direction
+  ): LayoutNode {
+    if (node.type === 'tile') {
+      if (node.id === tileId) {
+        return {
+          id: uuidv4(),
+          type: 'split',
+          direction,
+          ratio: 0.5,
+          children: [
+            { id: uuidv4(), type: 'tile' },
+            { id: uuidv4(), type: 'tile' },
+          ],
+        };
+      }
+      return node;
+    }
+
+    return {
+      ...node,
+      children: [
+        this.recursiveSplit(node.children[0], tileId, direction),
+        this.recursiveSplit(node.children[1], tileId, direction),
+      ],
+    };
   }
 }
