@@ -16,9 +16,9 @@ describe('UGLayout', () => {
       </LayoutProvider>
     );
 
-    // We expect to find two tiles
-    const tiles = screen.getAllByText(/Tile/i);
-    expect(tiles).toHaveLength(2);
+    // We expect to find two tiles rendering the picker
+    const pickers = screen.getAllByText(/Select a Component/i);
+    expect(pickers).toHaveLength(2);
 
     // We expect to find a gutter
     const gutter = document.querySelector('.ug-gutter');
@@ -28,5 +28,18 @@ describe('UGLayout', () => {
     if (gutter) {
       gutter.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     }
+  });
+
+  it('should render a picker when a tile is empty', () => {
+    const engine = new LayoutEngine();
+    // Root starts as an empty tile
+    
+    render(
+      <LayoutProvider engine={engine}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    expect(screen.getByText(/Select a Component/i)).toBeInTheDocument();
   });
 });

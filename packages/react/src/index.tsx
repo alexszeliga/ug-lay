@@ -38,6 +38,27 @@ export const useLayout = (): LayoutContextValue => {
   return context;
 };
 
+const DefaultPicker: React.FC<{ tileId: string }> = ({ tileId }) => {
+  const { engine, registry } = useLayout();
+  
+  if (!registry) return <div>Select a Component (No Registry)</div>;
+
+  return (
+    <div className="ug-picker" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '10px' }}>
+      <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginBottom: '4px' }}>Select a Component</div>
+      {Object.keys(registry).map((id) => (
+        <button 
+          key={id} 
+          onClick={() => engine.updateTile(tileId, { contentId: id })}
+          style={{ padding: '8px', cursor: 'pointer' }}
+        >
+          {id}
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const Gutter: React.FC<{ splitId: string; direction: Direction }> = ({ splitId, direction }) => {
   const { engine } = useLayout();
   const ref = useRef<HTMLDivElement>(null);
@@ -86,12 +107,11 @@ const TileComponent: React.FC<{ node: TileNode }> = ({ node }) => {
 
   return (
     <div className="ug-tile" data-tile-id={node.id} style={{ width: '100%', height: '100%', boxSizing: 'border-box', position: 'relative', overflow: 'hidden' }}>
-      {Component ? <Component node={node} /> : <div>Tile {node.id.substring(0, 8)}</div>}
+      {Component ? <Component node={node} /> : <DefaultPicker tileId={node.id} />}
     </div>
   );
 };
 
-// Forward declaration of the dispatcher
 const LayoutNodeComponent: React.FC<{ node: LayoutNode }> = ({ node }) => {
   if (node.type === 'tile') {
     return <TileComponent node={node} />;
