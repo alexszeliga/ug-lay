@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { LayoutNode, TileNode, Direction, TileType } from './types';
 
-export function findNode(node: LayoutNode, id: string): LayoutNode | null {
+export function findNode<T>(node: LayoutNode<T>, id: string): LayoutNode<T> | null {
   if (node.id === id) return node;
   if (node.type === 'split') {
     return findNode(node.children[0], id) || findNode(node.children[1], id);
@@ -9,12 +9,12 @@ export function findNode(node: LayoutNode, id: string): LayoutNode | null {
   return null;
 }
 
-export function recursiveUpdate(
-  node: LayoutNode,
+export function recursiveUpdate<T>(
+  node: LayoutNode<T>,
   id: string,
   updates: any,
   expectedType?: TileType
-): LayoutNode {
+): LayoutNode<T> {
   if (node.id === id) {
     if (expectedType && node.type !== expectedType) return node;
     return { ...node, ...updates };
@@ -31,7 +31,7 @@ export function recursiveUpdate(
   return node;
 }
 
-export function recursiveRemove(node: LayoutNode, tileId: string): LayoutNode {
+export function recursiveRemove<T>(node: LayoutNode<T>, tileId: string): LayoutNode<T> {
   if (node.type === 'tile') return node;
   const childA = node.children[0];
   const childB = node.children[1];
@@ -46,12 +46,12 @@ export function recursiveRemove(node: LayoutNode, tileId: string): LayoutNode {
   };
 }
 
-export function recursiveSplit(
-  node: LayoutNode,
+export function recursiveSplit<T>(
+  node: LayoutNode<T>,
   tileId: string,
   direction: Direction,
   defaultRatio: number
-): LayoutNode {
+): LayoutNode<T> {
   if (node.type === 'tile') {
     if (node.id === tileId) {
       return {
@@ -68,7 +68,7 @@ export function recursiveSplit(
           },
           { id: uuidv4(), type: 'tile' },
         ],
-      };
+      } as LayoutNode<T>;
     }
     return node;
   }
@@ -81,13 +81,13 @@ export function recursiveSplit(
   };
 }
 
-export function recursiveSwap(
-  node: LayoutNode,
+export function recursiveSwap<T>(
+  node: LayoutNode<T>,
   idA: string,
   idB: string,
-  dataA: TileNode,
-  dataB: TileNode
-): LayoutNode {
+  dataA: TileNode<T>,
+  dataB: TileNode<T>
+): LayoutNode<T> {
   if (node.id === idA) return { ...dataB };
   if (node.id === idB) return { ...dataA };
   if (node.type === 'split') {

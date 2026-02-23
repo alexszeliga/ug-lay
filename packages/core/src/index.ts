@@ -27,14 +27,14 @@ const DEFAULT_CONFIG: LayoutEngineConfig = {
   saveDebounceMs: 500,
 };
 
-export class LayoutEngine {
-  private state: LayoutState;
-  private subscribers: Subscriber[] = [];
-  private config: LayoutEngineConfig;
+export class LayoutEngine<TMetadata = any> {
+  private state: LayoutState<TMetadata>;
+  private subscribers: Subscriber<TMetadata>[] = [];
+  private config: LayoutEngineConfig<TMetadata>;
   private saveTimer: any = null;
 
-  constructor(initialState?: LayoutState, config?: Partial<LayoutEngineConfig>) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
+  constructor(initialState?: LayoutState<TMetadata>, config?: Partial<LayoutEngineConfig<TMetadata>>) {
+    this.config = { ...DEFAULT_CONFIG, ...config } as LayoutEngineConfig<TMetadata>;
     this.state = initialState || {
       root: {
         id: uuidv4(),
@@ -44,7 +44,7 @@ export class LayoutEngine {
     };
   }
 
-  subscribe(callback: Subscriber): () => void {
+  subscribe(callback: Subscriber<TMetadata>): () => void {
     this.subscribers.push(callback);
     return () => {
       this.subscribers = this.subscribers.filter((sub) => sub !== callback);
@@ -59,13 +59,8 @@ export class LayoutEngine {
 
   private queueSave(): void {
     if (!this.config.persistence) return;
-
-    if (this.saveTimer) {
-      clearTimeout(this.saveTimer);
-    }
-
+    if (this.saveTimer) clearTimeout(this.saveTimer);
     const delay = this.config.saveDebounceMs ?? 500;
-
     if (delay === 0) {
       this.config.persistence.save(this.state);
     } else {
@@ -76,7 +71,7 @@ export class LayoutEngine {
     }
   }
 
-  getState(): LayoutState {
+  getState(): LayoutState<TMetadata> {
     return this.state;
   }
 
@@ -106,7 +101,7 @@ export class LayoutEngine {
 
   updateTile(
     tileId: string,
-    updates: Partial<Omit<TileNode, 'id' | 'type'>>
+    updates: Partial<Omit<TileNode<TMetadata>, 'id' | 'type'>>
   ): void {
     this.state.root = recursiveUpdate(
       this.state.root,
@@ -128,23 +123,15 @@ export class LayoutEngine {
   }
 
   removeTile(tileId: string): void {
-    if (this.state.root.id === tileId && this.state.root.type === 'tile') {
-      return;
-    }
+    if (this.state.root.id === tileId && this.state.root.type === 'tile') return;
     this.state.root = recursiveRemove(this.state.root, tileId);
     this.notify();
   }
 
   swapTiles(sourceId: string, targetId: string): void {
-    const sourceNode = findNode(this.state.root, sourceId) as TileNode;
-    const targetNode = findNode(this.state.root, targetId) as TileNode;
-    if (
-      !sourceNode ||
-      !targetNode ||
-      sourceNode.type !== 'tile' ||
-      targetNode.type !== 'tile'
-    )
-      return;
+    const sourceNode = findNode(this.state.root, sourceId) as TileNode<TMetadata>;
+    const targetNode = findNode(this.state.root, targetId) as TileNode<TMetadata>;
+    if (!sourceNode || !targetNode || sourceNode.type !== 'tile' || targetNode.type !== 'tile') return;
 
     const sourceData = { ...sourceNode };
     const targetData = { ...targetNode };

@@ -6,37 +6,37 @@ export interface BaseNode {
   type: TileType;
 }
 
-export interface TileNode extends BaseNode {
+export interface TileNode<TMetadata = any> extends BaseNode {
   type: 'tile';
   contentId?: string;
-  metadata?: Record<string, any>;
+  metadata?: TMetadata;
 }
 
-export interface SplitNode extends BaseNode {
+export interface SplitNode<TMetadata = any> extends BaseNode {
   type: 'split';
   direction: Direction;
   ratio: number;
-  children: [LayoutNode, LayoutNode];
+  children: [LayoutNode<TMetadata>, LayoutNode<TMetadata>];
 }
 
-export type LayoutNode = TileNode | SplitNode;
+export type LayoutNode<TMetadata = any> = TileNode<TMetadata> | SplitNode<TMetadata>;
 
-export interface LayoutState {
-  root: LayoutNode;
+export interface LayoutState<TMetadata = any> {
+  root: LayoutNode<TMetadata>;
   maximizedTileId: string | null;
 }
 
-export interface LayoutEngineConfig {
+export interface LayoutEngineConfig<TMetadata = any> {
   minRatio: number;
   maxRatio: number;
   defaultSplitRatio: number;
-  persistence?: PersistenceAdapter;
+  persistence?: PersistenceAdapter<TMetadata>;
   saveDebounceMs?: number;
 }
 
-export interface PersistenceAdapter {
-  save(state: LayoutState): Promise<void>;
-  load(): Promise<LayoutState | null>;
+export interface PersistenceAdapter<TMetadata = any> {
+  save(state: LayoutState<TMetadata>): Promise<void>;
+  load(): Promise<LayoutState<TMetadata> | null>;
 }
 
-export type Subscriber = (state: LayoutState) => void;
+export type Subscriber<TMetadata = any> = (state: LayoutState<TMetadata>) => void;
