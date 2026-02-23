@@ -1,0 +1,19 @@
+{
+    "name": "ug-layout/php",
+    "description": "PHP DTOs and validation for ug-layout",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "UgLayout\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "UgLayout\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2"
+    }
+}
