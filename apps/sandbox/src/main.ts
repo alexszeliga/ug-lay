@@ -3,7 +3,7 @@ import { SandboxState } from './logic';
 
 const engine = new LayoutEngine();
 const sandbox = new SandboxState(engine);
-sandbox.dragHandleSelector = '.ug-tile-header'; // Set the configurable handle
+sandbox.dragHandleSelector = '.ug-tile-header';
 
 // --- Initial Setup ---
 const rootId = engine.getState().root.id;
@@ -23,7 +23,6 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
   if (node.type === 'tile') {
     const el = document.createElement('div');
     el.className = 'ug-tile';
-    el.draggable = true;
     el.dataset.tileId = node.id;
     if (node.id === sandbox.focusedTileId) {
       el.classList.add('focused');
@@ -32,7 +31,7 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
       el.classList.add('is-root');
     }
     el.innerHTML = `
-      <div class="ug-tile-header">
+      <div class="ug-tile-header" draggable="true">
         <span>${node.id.substring(0, 8)}</span>
         <div class="ug-controls">
           <button class="ug-btn" data-action="split" data-id="${node.id}" data-direction="horizontal" title="Split Horizontal">${ICON_SPLIT_H}</button>
@@ -89,6 +88,8 @@ let dragState: {
 
 document.body.addEventListener('mousedown', (event) => {
   const target = event.target as HTMLElement;
+  sandbox.lastMouseDownTarget = target;
+
   if (target.matches('.ug-gutter')) {
     event.preventDefault();
     dragState = {
@@ -126,7 +127,6 @@ document.body.addEventListener('mouseup', () => {
 document.body.addEventListener('click', (event) => {
   const target = event.target as HTMLElement;
   
-  // Only focus if clicking on the tile or header, but NOT on buttons
   if (!target.closest('.ug-btn')) {
     const tileElement = target.closest('.ug-tile');
     if (tileElement instanceof HTMLElement && tileElement.dataset.tileId) {
@@ -168,7 +168,6 @@ document.addEventListener('keydown', (event) => {
 document.body.addEventListener('dragstart', (event) => {
   const target = event.target as HTMLElement;
   
-  // VERIFY: Use the new canStartDrag logic
   if (!sandbox.canStartDrag(target)) {
     event.preventDefault();
     return;
@@ -185,7 +184,9 @@ document.body.addEventListener('dragover', (event) => {
   event.preventDefault();
   const target = event.target as HTMLElement;
   const tile = target.closest('.ug-tile') as HTMLElement;
+  
   document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
+  
   if (tile && tile.dataset.tileId !== sandbox.draggedTileId) {
     tile.classList.add('drag-over');
   }
@@ -203,9 +204,11 @@ document.body.addEventListener('drop', (event) => {
   event.preventDefault();
   const target = event.target as HTMLElement;
   const tile = target.closest('.ug-tile') as HTMLElement;
+  
   if (tile && tile.dataset.tileId) {
     sandbox.handleDrop(tile.dataset.tileId);
   }
+  
   document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
 });
 

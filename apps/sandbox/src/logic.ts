@@ -4,6 +4,7 @@ export class SandboxState {
   focusedTileId: string | null = null;
   draggedTileId: string | null = null;
   dragHandleSelector: string | null = null;
+  lastMouseDownTarget: HTMLElement | null = null;
   engine: LayoutEngine;
 
   constructor(engine: LayoutEngine) {
@@ -13,7 +14,8 @@ export class SandboxState {
 
   canStartDrag(el: HTMLElement): boolean {
     if (!this.dragHandleSelector) return true;
-    return !!el.closest(this.dragHandleSelector);
+    const target = this.lastMouseDownTarget || el;
+    return !!target.closest(this.dragHandleSelector);
   }
 
   handleDrop(targetId: string) {

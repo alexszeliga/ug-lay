@@ -30,7 +30,6 @@ describe('Sandbox Logic', () => {
     const state = new SandboxState(engine);
     state.dragHandleSelector = '.drag-handle';
 
-    // Mock elements
     const handleEl = { 
       closest: (s: string) => s === '.drag-handle' ? { id: 'handle' } : null 
     } as any;
@@ -39,7 +38,10 @@ describe('Sandbox Logic', () => {
       closest: (s: string) => s === '.drag-handle' ? null : null 
     } as any;
 
-    expect(state.canStartDrag(handleEl)).toBe(true);
-    expect(state.canStartDrag(contentEl)).toBe(false);
+    state.lastMouseDownTarget = handleEl;
+    expect(state.canStartDrag({} as any)).toBe(true);
+
+    state.lastMouseDownTarget = contentEl;
+    expect(state.canStartDrag({} as any)).toBe(false);
   });
 });
