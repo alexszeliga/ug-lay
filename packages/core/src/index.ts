@@ -41,8 +41,34 @@ export class LayoutEngine {
     return this.state;
   }
 
+  setRatio(splitId: string, ratio: number): void {
+    this.state.root = this.recursiveUpdate(this.state.root, splitId, { ratio });
+  }
+
   split(tileId: string, direction: Direction): void {
     this.state.root = this.recursiveSplit(this.state.root, tileId, direction);
+  }
+
+  private recursiveUpdate(
+    node: LayoutNode,
+    id: string,
+    updates: Partial<SplitNode>
+  ): LayoutNode {
+    if (node.id === id) {
+      return { ...node, ...updates } as LayoutNode;
+    }
+
+    if (node.type === 'split') {
+      return {
+        ...node,
+        children: [
+          this.recursiveUpdate(node.children[0], id, updates),
+          this.recursiveUpdate(node.children[1], id, updates),
+        ],
+      };
+    }
+
+    return node;
   }
 
   private recursiveSplit(

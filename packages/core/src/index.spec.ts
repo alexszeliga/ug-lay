@@ -32,4 +32,36 @@ describe('LayoutEngine', () => {
     expect(root.children[1].type).toBe('tile');
     expect(root.children[0].id).not.toBe(root.children[1].id);
   });
+
+  it('should allow nested splitting', () => {
+    const engine = new LayoutEngine();
+    engine.split(engine.getState().root.id, 'horizontal');
+    
+    const firstChildId = (engine.getState().root as any).children[0].id;
+    engine.split(firstChildId, 'vertical');
+
+    const state = engine.getState();
+    const root = state.root as any;
+    
+    // First child of root should now be a split
+    expect(root.children[0].type).toBe('split');
+    expect(root.children[0].direction).toBe('vertical');
+    expect(root.children[0].children).toHaveLength(2);
+    
+    // Second child of root should still be a tile
+    expect(root.children[1].type).toBe('tile');
+  });
+
+  it('should adjust the ratio of a split node', () => {
+    const engine = new LayoutEngine();
+    engine.split(engine.getState().root.id, 'horizontal');
+    
+    const root = engine.getState().root as any;
+    const splitId = root.id;
+
+    engine.setRatio(splitId, 0.75);
+
+    expect(engine.getState().root.type).toBe('split');
+    expect((engine.getState().root as any).ratio).toBe(0.75);
+  });
 });
