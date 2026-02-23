@@ -194,7 +194,12 @@ export class LayoutEngine {
           direction,
           ratio: 0.5,
           children: [
-            { id: uuidv4(), type: 'tile' },
+            { 
+              id: uuidv4(), 
+              type: 'tile',
+              contentId: node.contentId,
+              metadata: node.metadata ? { ...node.metadata } : undefined
+            },
             { id: uuidv4(), type: 'tile' },
           ],
         };

@@ -151,4 +151,24 @@ describe('LayoutEngine', () => {
     engine.minimize();
     expect(engine.getState().maximizedTileId).toBeNull();
   });
+
+  it('should preserve existing content in the first child when splitting', () => {
+    const engine = new LayoutEngine();
+    const rootId = engine.getState().root.id;
+    
+    // 1. Set some content
+    engine.updateTile(rootId, { contentId: 'existing-content', metadata: { foo: 'bar' } });
+
+    // 2. Split it
+    engine.split(rootId, 'horizontal');
+
+    // 3. Assert that the first child has the old content
+    const state = engine.getState();
+    const root = state.root as any;
+    expect(root.children[0].contentId).toBe('existing-content');
+    expect(root.children[0].metadata).toEqual({ foo: 'bar' });
+    
+    // 4. Assert that the second child is empty
+    expect(root.children[1].contentId).toBeUndefined();
+  });
 });
