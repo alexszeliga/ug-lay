@@ -16,6 +16,19 @@ importers:
         specifier: ^11.0.0
         version: 11.0.0
 
+  apps/sandbox:
+    dependencies:
+      '@ug-layout/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.0.0
+        version: 5.4.21
+
   packages/core:
     devDependencies:
       tsup:

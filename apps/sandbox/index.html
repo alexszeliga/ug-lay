@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ug-layout sandbox</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #1e1e1e;
+        color: #fff;
+        font-family: system-ui;
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+      }
+      .ug-tile {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: #888;
+        box-sizing: border-box;
+      }
+      .ug-split {
+        display: grid;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
