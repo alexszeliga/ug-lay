@@ -1,9 +1,12 @@
 import { LayoutEngine, LayoutNode, Direction } from '@ug-layout/core';
 
+// --- State Management ---
+let focusedTileId: string | null = null;
 const engine = new LayoutEngine();
 
 // --- Initial Setup ---
 const rootId = engine.getState().root.id;
+focusedTileId = rootId; // Focus the root tile initially
 engine.split(rootId, 'horizontal');
 const leftChildId = (engine.getState().root as any).children[0].id;
 const rightChildId = (engine.getState().root as any).children[1].id;
@@ -16,6 +19,10 @@ function renderNode(node: LayoutNode): HTMLElement {
   if (node.type === 'tile') {
     const el = document.createElement('div');
     el.className = 'ug-tile';
+    el.dataset.tileId = node.id; // Add ID for click handling
+    if (node.id === focusedTileId) {
+      el.classList.add('focused');
+    }
     el.innerHTML = `
       <div>
         <strong>Tile</strong><br/>
@@ -113,17 +120,50 @@ document.body.addEventListener('mouseup', () => {
 });
 
 
-// Attach event listeners to the body, using event delegation
+// --- Input Handling ---
 document.body.addEventListener('click', (event) => {
-  const target = event.target as HTMLButtonElement;
-  if (target.matches('button[data-action="split"]')) {
-    const id = target.dataset.id!;
-    const direction = target.dataset.direction! as Direction;
-    engine.split(id, direction);
+  const target = event.target as HTMLElement;
+
+  const tileElement = target.closest('.ug-tile');
+  if (tileElement instanceof HTMLElement && tileElement.dataset.tileId) {
+    focusedTileId = tileElement.dataset.tileId;
+    updateDOM(); // Manually update focus without waiting for engine
   }
-  if (target.matches('button[data-action="remove"]')) {
-    const id = target.dataset.id!;
-    engine.removeTile(id);
+
+  if (target instanceof HTMLButtonElement) {
+    const { action, id, direction } = target.dataset;
+    if (action === 'split' && id && direction) {
+      engine.split(id, direction as Direction);
+    } else if (action === 'remove' && id) {
+      engine.removeTile(id);
+    }
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (!focusedTileId) return;
+
+  // Using ctrlKey for cross-platform (maps to Cmd on Mac)
+  if (event.ctrlKey && event.key === 'd') {
+    event.preventDefault();
+    engine.split(focusedTileId, 'horizontal');
+  }
+
+  if (event.ctrlKey && event.key === 'v') {
+    event.preventDefault();
+    engine.split(focusedTileId, 'vertical');
+  }
+
+  if (event.ctrlKey && event.key === 'w') {
+    event.preventDefault();
+    engine.removeTile(focusedTileId);
+    // Find a new tile to focus
+    const state = engine.getState();
+    if (state.root.type === 'tile') {
+      focusedTileId = state.root.id;
+    } else {
+      focusedTileId = (state.root as any).children[0].id;
+    }
   }
 });
 
