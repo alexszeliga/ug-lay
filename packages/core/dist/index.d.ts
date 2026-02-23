@@ -26,6 +26,9 @@ interface LayoutEngineConfig {
     defaultSplitRatio: number;
 }
 type Subscriber = (state: LayoutState) => void;
+
+declare function findNode(node: LayoutNode, id: string): LayoutNode | null;
+
 declare class LayoutEngine {
     private state;
     private subscribers;
@@ -40,12 +43,7 @@ declare class LayoutEngine {
     updateTile(tileId: string, updates: Partial<Omit<TileNode, 'id' | 'type'>>): void;
     removeTile(tileId: string): void;
     swapTiles(sourceId: string, targetId: string): void;
-    private recursiveSwap;
     split(tileId: string, direction: Direction): void;
-    private findNode;
-    private recursiveUpdate;
-    private recursiveRemove;
-    private recursiveSplit;
 }
 
-export { type BaseNode, type Direction, LayoutEngine, type LayoutEngineConfig, type LayoutNode, type LayoutState, type SplitNode, type Subscriber, type TileNode, type TileType };
+export { type BaseNode, type Direction, LayoutEngine, type LayoutEngineConfig, type LayoutNode, type LayoutState, type SplitNode, type Subscriber, type TileNode, type TileType, findNode };

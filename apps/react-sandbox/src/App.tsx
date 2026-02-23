@@ -57,7 +57,7 @@ export const App = () => {
     <LayoutProvider 
       engine={engine} 
       registry={registry}
-      config={{ icons: CUSTOM_ICONS }}
+      // config={{ icons: CUSTOM_ICONS }}
     >
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ padding: '10px 20px', background: '#333', borderBottom: '1px solid #444' }}>

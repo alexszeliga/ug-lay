@@ -1,0 +1,343 @@
+"use strict";
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.tsx
+var index_exports = {};
+__export(index_exports, {
+  LayoutProvider: () => LayoutProvider,
+  UGLayout: () => UGLayout,
+  useLayout: () => useLayout
+});
+module.exports = __toCommonJS(index_exports);
+
+// src/context.tsx
+var import_react = require("react");
+var import_jsx_runtime = require("react/jsx-runtime");
+var LayoutContext = (0, import_react.createContext)(null);
+var LayoutProvider = ({ engine, registry, config, children }) => {
+  const [draggedId, setDraggedId] = (0, import_react.useState)(null);
+  const state = (0, import_react.useSyncExternalStore)(
+    (callback) => engine.subscribe(callback),
+    () => engine.getState()
+  );
+  const value = (0, import_react.useMemo)(() => ({
+    engine,
+    state,
+    registry,
+    config,
+    draggedId,
+    setDraggedId
+  }), [engine, state, registry, config, draggedId]);
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LayoutContext.Provider, { value, children });
+};
+var useLayout = () => {
+  const context = (0, import_react.useContext)(LayoutContext);
+  if (!context) {
+    throw new Error("useLayout must be used within a LayoutProvider");
+  }
+  return context;
+};
+
+// src/components/Tile.tsx
+var import_react2 = require("react");
+
+// src/icons.tsx
+var import_jsx_runtime2 = require("react/jsx-runtime");
+var ICON_SPLIT_H = /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
+  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 3v18" })
+] });
+var ICON_SPLIT_V = /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", style: { transform: "rotate(90deg)" }, children: [
+  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2" }),
+  /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M12 3v18" })
+] });
+var ICON_REMOVE = /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M18 6L6 18M6 6l12 12" }) });
+var ICON_MAXIMIZE = /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("path", { d: "M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" }) });
+
+// src/components/ControlButton.tsx
+var import_jsx_runtime3 = require("react/jsx-runtime");
+var ControlButton = ({ onClick, title, children, color }) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+  "button",
+  {
+    onClick: (e) => {
+      e.stopPropagation();
+      onClick();
+    },
+    title,
+    style: { border: "none", background: "none", color: color || "inherit", cursor: "pointer", padding: "2px", display: "flex", alignItems: "center", opacity: 0.7 },
+    onMouseEnter: (e) => e.currentTarget.style.opacity = "1",
+    onMouseLeave: (e) => e.currentTarget.style.opacity = "0.7",
+    children
+  }
+);
+
+// src/components/DefaultPicker.tsx
+var import_jsx_runtime4 = require("react/jsx-runtime");
+var DefaultPicker = ({ tileId }) => {
+  const { engine, registry } = useLayout();
+  if (!registry) return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { padding: "20px", textAlign: "center", color: "#666" }, children: "Select a Component (No Registry)" });
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "ug-picker", style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", padding: "10px" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { style: { gridColumn: "1 / -1", textAlign: "center", marginBottom: "4px", fontSize: "12px" }, children: "Select a Component" }),
+    Object.keys(registry).map((id) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "button",
+      {
+        onClick: () => engine.updateTile(tileId, { contentId: id }),
+        style: {
+          padding: "8px",
+          cursor: "pointer",
+          background: "#444",
+          color: "white",
+          border: "1px solid #555",
+          borderRadius: "4px"
+        },
+        children: id
+      },
+      id
+    ))
+  ] });
+};
+
+// src/components/Tile.tsx
+var import_jsx_runtime5 = require("react/jsx-runtime");
+var TileComponent = ({ node }) => {
+  const { registry, engine, setDraggedId, draggedId, config } = useLayout();
+  const [isOver, setIsOver] = (0, import_react2.useState)(false);
+  const Component = node.contentId && registry ? registry[node.contentId] : null;
+  const icons = {
+    maximize: config?.icons?.maximize || ICON_MAXIMIZE,
+    splitH: config?.icons?.splitH || ICON_SPLIT_H,
+    splitV: config?.icons?.splitV || ICON_SPLIT_V,
+    remove: config?.icons?.remove || ICON_REMOVE
+  };
+  const onDragStart = (e) => {
+    setDraggedId(node.id);
+    e.dataTransfer.setData("text/plain", node.id);
+  };
+  const onDragOver = (e) => {
+    e.preventDefault();
+    if (draggedId && draggedId !== node.id) setIsOver(true);
+  };
+  const onDragLeave = () => setIsOver(false);
+  const onDrop = (e) => {
+    e.preventDefault();
+    setIsOver(false);
+    if (draggedId && draggedId !== node.id) {
+      engine.swapTiles(draggedId, node.id);
+    }
+    setDraggedId(null);
+  };
+  const borderStyle = isOver ? "var(--ug-tile-border-dragover, 2px solid #ffcc00)" : "var(--ug-tile-border, 1px solid #444)";
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+    "div",
+    {
+      className: "ug-tile",
+      onDragOver,
+      onDragLeave,
+      onDrop,
+      style: {
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        boxSizing: "border-box",
+        border: borderStyle,
+        overflow: "hidden",
+        backgroundColor: "var(--ug-tile-bg, #2a2a2a)"
+      },
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+          "div",
+          {
+            className: "ug-tile-header",
+            draggable: true,
+            onDragStart,
+            style: {
+              background: "var(--ug-header-bg, #333)",
+              padding: "4px 8px",
+              cursor: "grab",
+              fontSize: "11px",
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
+              borderBottom: "var(--ug-header-border-bottom, 1px solid #444)",
+              color: "var(--ug-header-text, #888)"
+            },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { opacity: 0.5 }, children: node.id.substring(0, 8) }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { style: { fontWeight: "bold", color: "var(--ug-header-title, #ccc)", textAlign: "center" }, children: node.contentId || "" }),
+              /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "ug-controls", style: { display: "flex", gap: "4px", justifyContent: "flex-end" }, children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ControlButton, { onClick: () => engine.maximizeTile(node.id), title: "Maximize", children: icons.maximize }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ControlButton, { onClick: () => engine.split(node.id, "horizontal"), title: "Split Horizontal", children: icons.splitH }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ControlButton, { onClick: () => engine.split(node.id, "vertical"), title: "Split Vertical", children: icons.splitV }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ControlButton, { onClick: () => engine.removeTile(node.id), title: "Remove", color: "#ff4d4d", children: icons.remove })
+              ] })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "ug-tile-content", style: { flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }, children: Component ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Component, { node }) : /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(DefaultPicker, { tileId: node.id }) })
+      ]
+    }
+  );
+};
+
+// src/components/Gutter.tsx
+var import_react3 = require("react");
+var import_jsx_runtime6 = require("react/jsx-runtime");
+var Gutter = ({ splitId, direction }) => {
+  const { engine } = useLayout();
+  const ref = (0, import_react3.useRef)(null);
+  const handleMouseDown = (0, import_react3.useCallback)((e) => {
+    e.preventDefault();
+    const parent = ref.current?.parentElement;
+    if (!parent) return;
+    const rect = parent.getBoundingClientRect();
+    const gutterSize = 4;
+    const onMouseMove = (moveEvent) => {
+      let newRatio;
+      if (direction === "horizontal") {
+        newRatio = (moveEvent.clientX - rect.left - gutterSize / 2) / (rect.width - gutterSize);
+      } else {
+        newRatio = (moveEvent.clientY - rect.top - gutterSize / 2) / (rect.height - gutterSize);
+      }
+      engine.setRatio(splitId, newRatio);
+    };
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+      document.body.style.cursor = "";
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    document.body.style.cursor = direction === "horizontal" ? "ew-resize" : "ns-resize";
+  }, [engine, splitId, direction]);
+  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(
+    "div",
+    {
+      ref,
+      className: "ug-gutter",
+      style: {
+        backgroundColor: "var(--ug-gutter-bg, #444)",
+        cursor: direction === "horizontal" ? "ew-resize" : "ns-resize",
+        zIndex: 10
+      },
+      onMouseDown: handleMouseDown
+    }
+  );
+};
+
+// src/components/Split.tsx
+var import_jsx_runtime7 = require("react/jsx-runtime");
+var SplitComponent = ({ node }) => {
+  const r = node.ratio;
+  const gutterSize = 4;
+  const style = {
+    display: "grid",
+    width: "100%",
+    height: "100%",
+    gridTemplateColumns: node.direction === "horizontal" ? `calc(${r * 100}% - ${gutterSize / 2}px) ${gutterSize}px 1fr` : "100%",
+    gridTemplateRows: node.direction === "vertical" ? `calc(${r * 100}% - ${gutterSize / 2}px) ${gutterSize}px 1fr` : "100%"
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsxs)("div", { className: "ug-split", style, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(LayoutNodeComponent, { node: node.children[0] }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(Gutter, { splitId: node.id, direction: node.direction }),
+    /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(LayoutNodeComponent, { node: node.children[1] })
+  ] });
+};
+
+// src/components/LayoutNode.tsx
+var import_jsx_runtime8 = require("react/jsx-runtime");
+var LayoutNodeComponent = ({ node }) => {
+  return node.type === "tile" ? /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(TileComponent, { node }) : /* @__PURE__ */ (0, import_jsx_runtime8.jsx)(SplitComponent, { node });
+};
+
+// src/components/MaximizedOverlay.tsx
+var import_jsx_runtime9 = require("react/jsx-runtime");
+var MaximizedOverlay = ({ node }) => {
+  const { engine, registry, config } = useLayout();
+  const Component = node.contentId && registry ? registry[node.contentId] : null;
+  const icons = {
+    remove: config?.icons?.remove || ICON_REMOVE
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+    "div",
+    {
+      className: "ug-maximized-overlay",
+      style: {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "var(--ug-overlay-bg, rgba(0,0,0,0.9))",
+        zIndex: 1e3,
+        display: "flex",
+        flexDirection: "column"
+      },
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(
+          "div",
+          {
+            style: {
+              background: "var(--ug-overlay-header-bg, #007acc)",
+              padding: "10px 20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignSelf: "stretch",
+              alignItems: "center"
+            },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)("strong", { style: { color: "white" }, children: [
+                "Maximized View ",
+                node.contentId ? `- ${node.contentId}` : ""
+              ] }),
+              /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ControlButton, { onClick: () => engine.minimize(), title: "Close Maximized View", children: icons.remove })
+            ]
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)("div", { style: { flex: 1, padding: "40px" }, children: Component ? /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Component, { node }) : /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(DefaultPicker, { tileId: node.id }) })
+      ]
+    }
+  );
+};
+
+// src/utils.ts
+function findTile(node, id) {
+  if (node.id === id && node.type === "tile") return node;
+  if (node.type === "split") {
+    return findTile(node.children[0], id) || findTile(node.children[1], id);
+  }
+  return null;
+}
+
+// src/index.tsx
+var import_jsx_runtime10 = require("react/jsx-runtime");
+var UGLayout = () => {
+  const { state } = useLayout();
+  const maximizedNode = state.maximizedTileId ? findTile(state.root, state.maximizedTileId) : null;
+  return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)("div", { className: "ug-layout-root", style: { width: "100%", height: "100%", position: "relative" }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(LayoutNodeComponent, { node: state.root }),
+    maximizedNode && /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(MaximizedOverlay, { node: maximizedNode })
+  ] });
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  LayoutProvider,
+  UGLayout,
+  useLayout
+});

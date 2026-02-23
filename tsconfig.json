@@ -11,6 +11,11 @@
     "declarationMap": true,
     "sourceMap": true,
     "composite": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@ug-layout/core": ["packages/core/src/index.ts"],
+      "@ug-layout/react": ["packages/react/src/index.tsx"]
+    }
   }
 }
