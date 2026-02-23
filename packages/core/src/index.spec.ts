@@ -64,4 +64,22 @@ describe('LayoutEngine', () => {
     expect(engine.getState().root.type).toBe('split');
     expect((engine.getState().root as any).ratio).toBe(0.75);
   });
+
+  it('should initialize with an initial state', () => {
+    const initialState: LayoutState = {
+      root: {
+        id: '1',
+        type: 'split',
+        direction: 'horizontal',
+        ratio: 0.3,
+        children: [
+          { id: '2', type: 'tile' },
+          { id: '3', type: 'tile' },
+        ],
+      },
+    };
+
+    const engine = new LayoutEngine(initialState);
+    expect(engine.getState()).toEqual(initialState);
+  });
 });

@@ -28,8 +28,8 @@ export interface LayoutState {
 export class LayoutEngine {
   private state: LayoutState;
 
-  constructor() {
-    this.state = {
+  constructor(initialState?: LayoutState) {
+    this.state = initialState || {
       root: {
         id: uuidv4(),
         type: 'tile',
