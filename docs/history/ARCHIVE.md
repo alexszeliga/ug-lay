@@ -7,54 +7,37 @@
 ---
 
 ## Session 1: Foundation & Core Logic
+*(See previous entries for Monorepo, Splitting, Reactivity, and Basic Sandbox details)*
 
-### 1. Monorepo Scaffolding
-- **Objective:** Build for scale using a framework-agnostic core.
-- **Outcome:** Initialized `pnpm` workspaces. Created `@ug-layout/core` and `apps/sandbox`.
-- **Tooling:** TypeScript, Vitest, tsup.
+### 10. Refactor: Core & React Modularization
+- **Objective:** Improve DX by breaking down monolith files.
+- **Action:** Extracted `tree-utils.ts` from Core and divided React into specialized components (`Gutter`, `Tile`, `Split`, `context`).
+- **Outcome:** cleaner codebase with 100% test coverage preserved.
 
-### 2. Feature: Tile Splitting (TDD)
-- **Prompt:** "Think of it as a tiling window manager... perfect for a dashboard."
-- **TDD Red:** Attempted to call `engine.split()` on a non-existent method.
-- **Green:** Implemented a recursive tree transformation where a `Tile` is replaced by a `Split` node with two children.
-- **Refactor:** Unified the tree node types into a recursive `LayoutNode` union.
+### 11. Feature: Themeability (Headless but Pre-styled)
+- **Objective:** Allow developers to skin the UI without fighting inline styles.
+- **Implementation:** Refactored React package to use **CSS Variables** (`--ug-tile-bg`, etc.) with sensible fallbacks.
+- **Verification:** Updated React Sandbox to demonstrate a "darker" theme via root variables.
 
-### 3. Bug: Vite Import Resolution
-- **Issue:** Sandbox browser console showed `[plugin:vite:import-analysis] Failed to resolve entry for package "@ug-layout/core"`.
-- **Root Cause:** The `package.json` pointed to `/dist`, but the code wasn't built, and Vite didn't know how to resolve the workspace source.
-- **TDD Fix:** Added `exports.spec.ts` to verify resolution. Updated `package.json` with modern `exports` and added a `vite.config.ts` alias to point directly to `src/index.ts` for DX.
+### 12. Feature: Persistence Engine (Adapter Pattern)
+- **Objective:** Support LocalStorage and Database syncing.
+- **Architecture:** Implemented `PersistenceAdapter` interface in Core. 
+- **TDD:** Added debouncing logic (500ms default) to prevent database hammering during drags.
+- **Adapters:** Built `LocalStorageAdapter` and `HttpPersistenceAdapter`.
 
-### 4. Feature: Reactivity (Pub-Sub)
-- **Objective:** Decouple the engine from the UI.
-- **TDD Red:** Verified that state changes didn't trigger an external spy.
-- **Green:** Implemented `subscribe(callback)` and `notify()` within `LayoutEngine`.
-- **Sandbox Integration:** Updated the manual `updateDOM` to fire automatically on engine changes.
+### 13. Feature: PHP DTO & Validation Layer
+- **Objective:** Server-side parity for PHP frameworks.
+- **Implementation:** Created `ug-layout/php` library with recursive DTOs (`LayoutState`, `SplitNode`, `TileNode`).
+- **Laravel Ready:** Included a `Layout` Eloquent model and Service Provider.
 
-### 5. Bug: Gutter Jumpiness (Geometry)
-- **Issue:** When dragging gutters, the layout would "shoot" to the edge or vibrate.
-- **Root Cause:** `getBoundingClientRect()` was called inside the `mousemove` handler, creating a feedback loop as the element resized itself while being measured.
-- **TDD Fix:** Hardened the test setup with `geometry.spec.ts`.
-- **Green Implementation:** Refactored to cache the container's `rect` once on `mousedown`.
+### 14. Feature: Content Switching & Reset
+- **Objective:** Allow users to change component types or return to the picker.
+- **Action:** Added `engine.resetTile(id)` to Core and a "Reset" icon button to the standardized headers.
 
-### 6. Feature: Tile Removal & Promotion
-- **Objective:** Delete tiles and reclaim space.
-- **Logic:** Recursive search for parent; replace parent `Split` node with the remaining sibling (promotion).
-- **TDD Verified:** Confirmed both shallow and nested removal.
-
-### 7. Feature: Keyboard Shortcuts & Focus
-- **Input Model:** Borrowed from `tmux`/`i3`.
-- **Bindings:** `Ctrl+d` (Split H), `Ctrl+v` (Split V), `Ctrl+x` (Remove).
-- **Architecture:** Implemented in the *Integration Layer* (Sandbox) to keep Core pure.
-
-### 8. Feature: Structural Swapping
-- **Requirement:** Drag one tile over another to swap.
-- **Challenge:** Initial implementation swapped only content but kept IDs fixed.
-- **Refactor:** Implemented `recursiveSwap` to exchange full identities (IDs + Content) in a single tree traversal pass.
-
-### 9. Feature: Maximization & Component Picker
-- **Objective:** User-configurable tiles.
-- **Implementation:** Added `maximizedTileId` to core state. Built a `REGISTRY` in the sandbox. Tiles without a `contentId` render a picker UI.
-- **UX Improvement:** Updated splitting to preserve content in the first child instead of clearing both.
+### 15. The PHP Sandbox (Full Stack Proof)
+- **Objective:** Demonstrate end-to-end persistence via a PHP backend.
+- **Outcome:** Built `apps/php-sandbox` using Vite (frontend) + Native PHP (API). Verified that layouts save to `layout.json` and persist across refreshes.
 
 ---
-*End of Session 1 Archive*
+**Current Version:** 0.1.0 (Development)  
+**Status:** Feature Complete for MVP.

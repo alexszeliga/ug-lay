@@ -3,7 +3,11 @@
 ## Metadata
 - **Initial Model:** Gemini 2.0 Flash
 - **Project Start:** Monday, February 23, 2026
-- **Current Status:** Core Engine (Reactive State Machine) is complete. Vanilla TS Sandbox is functional.
+- **Current Status:** Full-Stack Ecosystem Complete. 
+  - Reactive Core Engine (TS)
+  - Themeable React Integration
+  - PHP DTO & Validation Layer
+  - Persistent Sandboxes (LocalStorage & PHP/SQLite)
 
 ## Foundational Mandates
 1. **Version Control:** Git usage with the **Conventional Commits** specification.
@@ -14,5 +18,7 @@
 ## System Architecture
 The layout is managed as a **Recursive Binary Tree**.
 - **Nodes:** Either a `Tile` (Leaf) or a `Split` (Branch).
-- **State Machine:** Pure logic in `@ug-layout/core` handles tree transformations (split, remove, swap, resize).
+- **State Machine:** Pure logic in `@ug-layout/core` handles tree transformations (split, remove, swap, resize, maximize, reset).
 - **Reactivity:** Pub-Sub implementation allows any renderer to subscribe to state changes.
+- **Persistence:** Plug-and-play Adapter pattern (LocalStorage, HTTP) with built-in debouncing.
+- **Backend:** PHP DTO layer ensures type-safe persistence and validation for PHP-based frameworks (Laravel/Symfony).
