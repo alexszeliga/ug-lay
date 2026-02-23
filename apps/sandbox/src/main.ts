@@ -1,13 +1,11 @@
 import { LayoutEngine, LayoutNode, Direction } from '@ug-layout/core';
+import { SandboxState } from './logic';
 
-// --- State Management ---
-let focusedTileId: string | null = null;
-let draggedTileId: string | null = null;
 const engine = new LayoutEngine();
+const sandbox = new SandboxState(engine);
 
 // --- Initial Setup ---
 const rootId = engine.getState().root.id;
-focusedTileId = rootId; // Focus the root tile initially
 engine.split(rootId, 'horizontal');
 const leftChildId = (engine.getState().root as any).children[0].id;
 const rightChildId = (engine.getState().root as any).children[1].id;
@@ -23,7 +21,7 @@ function renderNode(node: LayoutNode, isRoot: boolean = false): HTMLElement {
     el.className = 'ug-tile';
     el.draggable = true;
     el.dataset.tileId = node.id;
-    if (node.id === focusedTileId) {
+    if (node.id === sandbox.focusedTileId) {
       el.classList.add('focused');
     }
     if (isRoot) {
@@ -122,7 +120,7 @@ document.body.addEventListener('click', (event) => {
   const target = event.target as HTMLElement;
   const tileElement = target.closest('.ug-tile');
   if (tileElement instanceof HTMLElement && tileElement.dataset.tileId) {
-    focusedTileId = tileElement.dataset.tileId;
+    sandbox.focusedTileId = tileElement.dataset.tileId;
     updateDOM();
   }
   if (target instanceof HTMLButtonElement) {
@@ -136,20 +134,20 @@ document.body.addEventListener('click', (event) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (!focusedTileId) return;
+  if (!sandbox.focusedTileId) return;
   if (event.ctrlKey && event.key === 'd') {
     event.preventDefault();
-    engine.split(focusedTileId, 'horizontal');
+    engine.split(sandbox.focusedTileId, 'horizontal');
   }
   if (event.ctrlKey && event.key === 'v') {
     event.preventDefault();
-    engine.split(focusedTileId, 'vertical');
+    engine.split(sandbox.focusedTileId, 'vertical');
   }
   if (event.ctrlKey && event.key === 'x') {
     event.preventDefault();
-    engine.removeTile(focusedTileId);
+    engine.removeTile(sandbox.focusedTileId);
     const state = engine.getState();
-    focusedTileId = state.root.type === 'tile' ? state.root.id : (state.root as any).children[0].id;
+    sandbox.focusedTileId = state.root.type === 'tile' ? state.root.id : (state.root as any).children[0].id;
   }
 });
 
@@ -158,20 +156,17 @@ document.body.addEventListener('dragstart', (event) => {
   const target = event.target as HTMLElement;
   const tile = target.closest('.ug-tile') as HTMLElement;
   if (tile) {
-    draggedTileId = tile.dataset.tileId!;
-    event.dataTransfer?.setData('text/plain', draggedTileId);
+    sandbox.draggedTileId = tile.dataset.tileId!;
+    event.dataTransfer?.setData('text/plain', sandbox.draggedTileId);
   }
 });
 
 document.body.addEventListener('dragover', (event) => {
-  event.preventDefault(); // Required to allow drop
+  event.preventDefault();
   const target = event.target as HTMLElement;
   const tile = target.closest('.ug-tile') as HTMLElement;
-  
-  // Clear other highlights
   document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
-  
-  if (tile && tile.dataset.tileId !== draggedTileId) {
+  if (tile && tile.dataset.tileId !== sandbox.draggedTileId) {
     tile.classList.add('drag-over');
   }
 });
@@ -189,13 +184,10 @@ document.body.addEventListener('drop', (event) => {
   const target = event.target as HTMLElement;
   const tile = target.closest('.ug-tile') as HTMLElement;
   
-  if (tile && draggedTileId && tile.dataset.tileId !== draggedTileId) {
-    const targetId = tile.dataset.tileId!;
-    engine.swapTiles(draggedTileId, targetId);
-    focusedTileId = targetId; // Set focus to the dropped-onto tile
+  if (tile && tile.dataset.tileId) {
+    sandbox.handleDrop(tile.dataset.tileId);
   }
   
-  draggedTileId = null;
   document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
 });
 
