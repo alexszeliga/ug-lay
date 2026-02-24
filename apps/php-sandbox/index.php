@@ -4,11 +4,19 @@ require __DIR__ . '/vendor/autoload.php';
 
 $storageFile = __DIR__ . '/layout.json';
 
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
 // --- API Logic ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['REQUEST_URI'] === '/api/layout') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $path === '/api/layout') {
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
     
+    if ($data === null) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid JSON input', 'raw' => $json]);
+        exit;
+    }
+
     try {
         // Validate using our PHP package
         $state = \UgLayout\LayoutState::fromArray($data);
@@ -18,13 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['REQUEST_URI'] === '/api/l
         echo json_encode(['success' => true]);
         exit;
     } catch (\Throwable $e) {
+        error_log("Layout Save Error: " . $e->getMessage());
         http_response_code(400);
         echo json_encode(['error' => $e->getMessage()]);
         exit;
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_SERVER['REQUEST_URI'] === '/api/layout') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $path === '/api/layout') {
     header('Content-Type: application/json');
     if (file_exists($storageFile)) {
         echo file_get_contents($storageFile);

@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cee70a22a06b20c4ccf572a431d5e939",
+    "content-hash": "0f852248450955be20f5931d2b3df142",
     "packages": [
         {
-            "name": "ug-layout/php",
-            "version": "dev-master",
+            "name": "ug-lay/php",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "../../packages/php",
-                "reference": "8e01761f35533f47c99a18f6bd2bf32e7dcacd96"
+                "reference": "9efe3ba5be30f94b882596fb40a4473137488fcd"
             },
             "require": {
                 "php": "^8.2"
@@ -31,7 +31,7 @@
             "license": [
                 "MIT"
             ],
-            "description": "PHP DTOs and validation for ug-layout",
+            "description": "PHP DTOs and validation for ug-lay",
             "transport-options": {
                 "relative": true
             }
@@ -39,11 +39,9 @@
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {
-        "ug-layout/php": 20
-    },
-    "prefer-stable": false,
+    "minimum-stability": "dev",
+    "stability-flags": {},
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},

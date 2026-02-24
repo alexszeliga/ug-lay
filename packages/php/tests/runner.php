@@ -62,3 +62,28 @@ it('can represent a complex nested layout tree', function() {
     // Test serialization parity
     assert($state->toArray() === $data);
 });
+
+it('can represent a tile with tabs', function() {
+    $data = [
+        'root' => [
+            'id' => 'tile-1',
+            'type' => 'tile',
+            'contentId' => null,
+            'metadata' => null,
+            'tabs' => [
+                ['id' => 'tab-1', 'contentId' => 'a', 'metadata' => null],
+                ['id' => 'tab-2', 'contentId' => 'b', 'metadata' => ['foo' => 'bar']]
+            ],
+            'activeTabIndex' => 1
+        ],
+        'maximizedTileId' => null
+    ];
+
+    $state = \UgLayout\LayoutState::fromArray($data);
+    $output = $state->toArray();
+    
+    assert($output['root']['tabs'][0]['id'] === 'tab-1');
+    assert($output['root']['tabs'][1]['metadata']['foo'] === 'bar');
+    assert($output['root']['activeTabIndex'] === 1);
+    assert($output === $data);
+});

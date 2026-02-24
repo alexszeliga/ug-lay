@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs:generate": "typedoc"
+    "docs:generate": "typedoc",
+    "sandbox:php": "pnpm --filter php-sandbox-frontend dev"
   },
   "keywords": [],
   "author": "",
