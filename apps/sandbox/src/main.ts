@@ -85,6 +85,7 @@ async function init() {
     gutter.className = 'ug-gutter';
     gutter.dataset.splitId = node.id;
     gutter.dataset.direction = node.direction;
+    gutter.style.touchAction = 'none'; // CRITICAL for touch support
 
     const gSize = SANDBOX_CONFIG.gutterSize;
     if (node.direction === 'horizontal') {
@@ -144,27 +145,43 @@ async function init() {
 
   document.getElementById('close-maximize')?.addEventListener('click', () => engine.minimize());
 
-  // Drag-Resize
-  let dragResizeState: { splitId: string; direction: Direction; rect: DOMRect } | null = null;
-  document.body.addEventListener('mousedown', (e) => {
+  // --- Pointer-based Resize Logic ---
+  document.body.addEventListener('pointerdown', (e) => {
     const t = e.target as HTMLElement;
     sandbox.lastMouseDownTarget = t;
+    
     if (t.matches('.ug-gutter')) {
+      if (e.button !== 0) return;
       e.preventDefault();
-      dragResizeState = { splitId: t.dataset.splitId!, direction: t.dataset.direction as any, rect: t.parentElement!.getBoundingClientRect() };
+      
+      const splitId = t.dataset.splitId!;
+      const direction = t.dataset.direction as any;
+      const rect = t.parentElement!.getBoundingClientRect();
+      const gSize = SANDBOX_CONFIG.gutterSize;
+      
       document.body.classList.add('dragging');
+      document.body.style.cursor = direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
+
+      const onPointerMove = (moveEvent: PointerEvent) => {
+        let r = direction === 'horizontal' 
+          ? (moveEvent.clientX - rect.left - gSize/2) / (rect.width - gSize) 
+          : (moveEvent.clientY - rect.top - gSize/2) / (rect.height - gSize);
+        engine.setRatio(splitId, r);
+      };
+
+      const onPointerUp = () => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        document.body.classList.remove('dragging');
+        document.body.style.cursor = '';
+      };
+
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
     }
   });
-  document.body.addEventListener('mousemove', (e) => {
-    if (!dragResizeState) return;
-    const { splitId, direction, rect } = dragResizeState;
-    const gSize = SANDBOX_CONFIG.gutterSize;
-    let r = direction === 'horizontal' ? (e.clientX - rect.left - gSize/2) / (rect.width - gSize) : (e.clientY - rect.top - gSize/2) / (rect.height - gSize);
-    engine.setRatio(splitId, r);
-  });
-  document.body.addEventListener('mouseup', () => { dragResizeState = null; document.body.classList.remove('dragging'); });
 
-  // Drag-Swap/Move
+  // Drag-Swap/Move (Standard Drag-and-Drop API handles touch-to-drag in modern mobile browsers)
   let currentDropAction: DropAction | null = null;
 
   document.body.addEventListener('dragstart', (e) => {

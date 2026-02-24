@@ -11,7 +11,10 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
   const { engine } = useLayout();
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    // Only handle primary pointer button (usually left click or touch)
+    if (e.button !== 0) return;
+    
     e.preventDefault();
     const parent = ref.current?.parentElement;
     if (!parent) return;
@@ -19,7 +22,7 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
     const rect = parent.getBoundingClientRect();
     const gutterSize = 4;
 
-    const onMouseMove = (moveEvent: MouseEvent) => {
+    const onPointerMove = (moveEvent: PointerEvent) => {
       let newRatio;
       if (direction === 'horizontal') {
         newRatio = (moveEvent.clientX - rect.left - gutterSize / 2) / (rect.width - gutterSize);
@@ -29,14 +32,14 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
       engine.setRatio(splitId, newRatio);
     };
 
-    const onMouseUp = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+    const onPointerUp = () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
       document.body.style.cursor = '';
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
     document.body.style.cursor = direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
   }, [engine, splitId, direction]);
 
@@ -47,9 +50,10 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
       style={{ 
         backgroundColor: 'var(--ug-gutter-bg, #444)', 
         cursor: direction === 'horizontal' ? 'ew-resize' : 'ns-resize', 
-        zIndex: 10 
+        zIndex: 10,
+        touchAction: 'none' // CRITICAL: Prevents browser scrolling during touch drag
       }} 
-      onMouseDown={handleMouseDown} 
+      onPointerDown={handlePointerDown} 
     />
   );
 };

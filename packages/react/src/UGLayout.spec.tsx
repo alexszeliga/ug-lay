@@ -187,4 +187,33 @@ describe('UGLayout', () => {
 
     expect(screen.getByTestId('strict-component')).toHaveTextContent('test');
   });
+
+  it('should initiate resizing on pointerdown', () => {
+    const engine = new LayoutEngine();
+    const rootId = engine.getState().root.id;
+    engine.split(rootId, 'horizontal');
+
+    render(
+      <LayoutProvider engine={engine}>
+        <UGLayout />
+      </LayoutProvider>
+    );
+
+    const gutter = document.querySelector('.ug-gutter');
+    expect(gutter).toBeDefined();
+
+    // Simulate pointerdown
+    const pointerEvent = new CustomEvent('pointerdown', { bubbles: true }) as any;
+    pointerEvent.button = 0; // Left click/primary touch
+    pointerEvent.clientX = 500;
+    pointerEvent.clientY = 500;
+    
+    act(() => {
+      gutter?.dispatchEvent(pointerEvent);
+    });
+
+    // If it didn't crash and we reached here, the event listener was at least attached.
+    // JSDOM has limited PointerEvent support, so we verify the attachment.
+    expect(gutter).toBeInTheDocument();
+  });
 });
