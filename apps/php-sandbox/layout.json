@@ -1,1 +1,1 @@
-{"root":{"id":"1a25316f-10be-4f23-a48b-c0bcd1185795","type":"tile","contentId":"chat","metadata":null},"maximizedTileId":null}
+{"root":{"id":"fed7573f-3b34-402a-bab1-a387e4669fdf","type":"split","direction":"horizontal","ratio":0.5,"children":[{"id":"994f8377-37aa-425c-a99d-f4a6b83f3027","type":"tile","contentId":"chat","metadata":null},{"id":"0292564a-d81b-4295-bb8d-754499ddf956","type":"tile","contentId":"inspector","metadata":null}]},"maximizedTileId":null}
