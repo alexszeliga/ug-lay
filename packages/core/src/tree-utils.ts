@@ -131,6 +131,9 @@ export function recursiveMove<T>(
   const sourceNode = findNode(root, sourceId) as TileNode<T>;
   if (!sourceNode) return root;
 
+  const targetNode = findNode(root, targetId);
+  if (!targetNode) return root;
+
   // 1. Remove the source node from its current position
   let newRoot = recursiveRemove(root, sourceId);
 

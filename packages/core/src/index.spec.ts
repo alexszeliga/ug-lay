@@ -344,5 +344,36 @@ describe('LayoutEngine', () => {
       engine.moveTile(rootId, rootId, 'horizontal', 'before');
       expect(engine.getState().root).toEqual(rootBefore);
     });
+
+    it('should do nothing when updating a node with mismatched type', () => {
+      const engine = new LayoutEngine();
+      engine.split(engine.getState().root.id, 'horizontal');
+      const splitId = engine.getState().root.id;
+      const rootBefore = engine.getState().root;
+      
+      // Try to update a SPLIT node using updateTile (which expects 'tile')
+      engine.updateTile(splitId, { contentId: 'fail' } as any);
+      
+      expect(engine.getState().root).toEqual(rootBefore);
+    });
+
+    it('should do nothing when swapping with non-existent IDs', () => {
+      const engine = new LayoutEngine();
+      const rootBefore = engine.getState().root;
+      engine.swapTiles('1', '2');
+      expect(engine.getState().root).toEqual(rootBefore);
+    });
+
+    it('should not remove the source if target is not found during moveTile', () => {
+      const engine = new LayoutEngine();
+      engine.split(engine.getState().root.id, 'horizontal');
+      const rootBefore = engine.getState().root;
+      const idA = (rootBefore as any).children[0].id;
+      
+      engine.moveTile(idA, 'non-existent', 'horizontal', 'before');
+      
+      // Current implementation actually removes idA! This test should FAIL (Red phase)
+      expect(engine.getState().root).toEqual(rootBefore);
+    });
   });
 });
