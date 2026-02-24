@@ -304,4 +304,44 @@ describe('LayoutEngine', () => {
       expect(state.contentId).toBeUndefined();
     });
   });
+
+  describe('Edge Case Logic', () => {
+    it('should handle removing a non-existent tile', () => {
+      const engine = new LayoutEngine();
+      const rootBefore = engine.getState().root;
+      engine.removeTile('non-existent');
+      expect(engine.getState().root).toBe(rootBefore);
+    });
+
+    it('should move a tile to a deeply nested target', () => {
+      const engine = new LayoutEngine();
+      // Path: root -> split(A, split(B, C))
+      engine.split(engine.getState().root.id, 'horizontal'); // Root -> A, B
+      const root = engine.getState().root as any;
+      const idA = root.children[0].id;
+      const idB = root.children[1].id;
+      
+      engine.split(idB, 'vertical'); // B -> C, D
+      const splitB = (engine.getState().root as any).children[1];
+      const idC = splitB.children[0].id;
+      const idD = splitB.children[1].id;
+
+      // Move A to 'after' D
+      engine.moveTile(idA, idD, 'horizontal', 'after');
+
+      const state = engine.getState().root as any;
+      // Root should now be what was idB (promoted)
+      // and its second child (D) should now be a split containing D and A
+      expect(state.children[1].type).toBe('split');
+      expect(state.children[1].children[1].id).toBe(idA);
+    });
+
+    it('should do nothing when moving a tile to itself', () => {
+      const engine = new LayoutEngine();
+      const rootId = engine.getState().root.id;
+      const rootBefore = engine.getState().root;
+      engine.moveTile(rootId, rootId, 'horizontal', 'before');
+      expect(engine.getState().root).toEqual(rootBefore);
+    });
+  });
 });

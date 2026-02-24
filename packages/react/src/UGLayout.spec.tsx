@@ -213,10 +213,13 @@ describe('UGLayout', () => {
     expect(screen.getByTestId('strict-component')).toHaveTextContent('test');
   });
 
-  it('should initiate resizing on pointerdown', () => {
+  it('should update split ratio when dragging the gutter', () => {
     const engine = new LayoutEngine();
     const rootId = engine.getState().root.id;
     engine.split(rootId, 'horizontal');
+    const splitId = engine.getState().root.id;
+    
+    const setRatioSpy = vi.spyOn(engine, 'setRatio');
 
     render(
       <LayoutProvider engine={engine}>
@@ -224,21 +227,35 @@ describe('UGLayout', () => {
       </LayoutProvider>
     );
 
-    const gutter = document.querySelector('.ug-gutter');
-    expect(gutter).toBeDefined();
-
-    // Simulate pointerdown
-    const pointerEvent = new CustomEvent('pointerdown', { bubbles: true }) as any;
-    pointerEvent.button = 0; // Left click/primary touch
-    pointerEvent.clientX = 500;
-    pointerEvent.clientY = 500;
+    const gutter = document.querySelector('.ug-gutter') as HTMLElement;
+    const split = document.querySelector('.ug-split') as HTMLElement;
     
-    act(() => {
-      gutter?.dispatchEvent(pointerEvent);
+    // Mock parent dimensions for ratio calculation
+    // Split container: 1000px wide, from 0 to 1000
+    vi.spyOn(split, 'getBoundingClientRect').mockReturnValue({
+      left: 0, top: 0, width: 1000, height: 1000, 
+      right: 1000, bottom: 1000, x: 0, y: 0, toJSON: () => {}
     });
 
-    // If it didn't crash and we reached here, the event listener was at least attached.
-    // JSDOM has limited PointerEvent support, so we verify the attachment.
-    expect(gutter).toBeInTheDocument();
+    // 1. PointerDown on gutter
+    const downEvent = new CustomEvent('pointerdown', { bubbles: true }) as any;
+    downEvent.button = 0;
+    downEvent.clientX = 500;
+    fireEvent(gutter, downEvent);
+
+    // 2. PointerMove on window
+    const moveEvent = new CustomEvent('pointermove', { bubbles: true }) as any;
+    moveEvent.clientX = 750; // Move to 75%
+    act(() => {
+      window.dispatchEvent(moveEvent);
+    });
+
+    // 3. Assert
+    // Gutter center at 750. Split width 1000. Gutter size 4.
+    // calculateRatio: (750 - 0 - 2) / (1000 - 4) = 748 / 996 ≈ 0.751
+    expect(setRatioSpy).toHaveBeenCalled();
+    const calledRatio = setRatioSpy.mock.calls[0][1];
+    expect(calledRatio).toBeCloseTo(0.75, 1);
+    expect(setRatioSpy.mock.calls[0][0]).toBe(splitId);
   });
 });

@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Direction, calculateRatio } from '@ug-layout/core';
 import { useLayout } from '../context';
 
@@ -9,9 +9,34 @@ export interface GutterProps {
 
 export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
   const { engine } = useLayout();
+  const [isResizing, setIsResizing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const parentRectRef = useRef<DOMRect | null>(null);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      if (parentRectRef.current) {
+        const newRatio = calculateRatio(parentRectRef.current, moveEvent.clientX, moveEvent.clientY, direction);
+        engine.setRatio(splitId, newRatio);
+      }
+    };
+
+    const onPointerUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = '';
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [isResizing, engine, splitId, direction]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
     // Only handle primary pointer button (usually left click or touch)
     if (e.button !== 0) return;
     
@@ -19,23 +44,10 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
     const parent = ref.current?.parentElement;
     if (!parent) return;
 
-    const rect = parent.getBoundingClientRect();
-
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      const newRatio = calculateRatio(rect, moveEvent.clientX, moveEvent.clientY, direction);
-      engine.setRatio(splitId, newRatio);
-    };
-
-    const onPointerUp = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      document.body.style.cursor = '';
-    };
-
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
+    parentRectRef.current = parent.getBoundingClientRect();
+    setIsResizing(true);
     document.body.style.cursor = direction === 'horizontal' ? 'ew-resize' : 'ns-resize';
-  }, [engine, splitId, direction]);
+  };
 
   return (
     <div 
@@ -48,6 +60,7 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
         touchAction: 'none' // CRITICAL: Prevents browser scrolling during touch drag
       }} 
       onPointerDown={handlePointerDown} 
+      onMouseDown={handlePointerDown}
     />
   );
 };
