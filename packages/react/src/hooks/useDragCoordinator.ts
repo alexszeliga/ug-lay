@@ -2,13 +2,13 @@ import { useRef, useCallback, useEffect } from 'react';
 import { DropAction, getDropAction, LayoutEngine } from '@ug-layout/core';
 import { DragState } from '../context';
 
-export interface UseDragCoordinatorProps {
-  engine: LayoutEngine;
+export interface UseDragCoordinatorProps<TMetadata = any> {
+  engine: LayoutEngine<TMetadata>;
   dragState: DragState | null;
-  setDragState: (state: DragState | null | ((prev: DragState | null) => DragState | null)) => void;
+  setDragState: (state: DragState | null) => void;
 }
 
-export function useDragCoordinator({ engine, dragState, setDragState }: UseDragCoordinatorProps) {
+export function useDragCoordinator<TMetadata = any>({ engine, dragState, setDragState }: UseDragCoordinatorProps<TMetadata>) {
   const dragStateRef = useRef(dragState);
   dragStateRef.current = dragState;
 

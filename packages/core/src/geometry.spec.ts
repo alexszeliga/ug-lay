@@ -39,12 +39,16 @@ describe('Drop Position Logic', () => {
     
     const leftEdge = getDropAction(rect, 10, 200);
     expect(leftEdge.type).toBe('split');
-    expect(leftEdge.direction).toBe('horizontal');
-    expect(leftEdge.side).toBe('before');
+    if (leftEdge.type === 'split') {
+      expect(leftEdge.direction).toBe('horizontal');
+      expect(leftEdge.side).toBe('before');
+    }
 
     const topEdge = getDropAction(rect, 200, 10);
     expect(topEdge.type).toBe('split');
-    expect(topEdge.direction).toBe('vertical');
-    expect(topEdge.side).toBe('before');
+    if (topEdge.type === 'split') {
+      expect(topEdge.direction).toBe('vertical');
+      expect(topEdge.side).toBe('before');
+    }
   });
 });

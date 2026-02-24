@@ -118,7 +118,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
       <div 
         className="ug-tile-header" 
         onPointerDown={onPointerDown}
-        onMouseDown={onPointerDown}
+        onMouseDown={(e) => onPointerDown(e as any)}
         style={{ 
           background: 'var(--ug-header-bg, #333)', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
           display: 'grid', gridTemplateColumns: '80px 1fr 80px', alignItems: 'center',

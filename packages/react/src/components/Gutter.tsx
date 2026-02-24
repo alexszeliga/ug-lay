@@ -60,7 +60,7 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
         touchAction: 'none' // CRITICAL: Prevents browser scrolling during touch drag
       }} 
       onPointerDown={handlePointerDown} 
-      onMouseDown={handlePointerDown}
+      onMouseDown={(e) => handlePointerDown(e as any)}
     />
   );
 };

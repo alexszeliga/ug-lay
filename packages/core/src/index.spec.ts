@@ -77,6 +77,7 @@ describe('LayoutEngine', () => {
           { id: '3', type: 'tile' },
         ],
       },
+      maximizedTileId: null,
     };
 
     const engine = new LayoutEngine(initialState);
