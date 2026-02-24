@@ -1,28 +1,28 @@
-import { LayoutEngine, LayoutNode, Direction, TileNode, HttpPersistenceAdapter, findNode } from '@ug-layout/core';
+import { LayoutEngine, LayoutNode, Direction, TileNode, LocalStorageAdapter, getDropAction, DropAction, findNode } from '@ug-layout/core';
 import { SandboxState } from './logic';
 import { SANDBOX_CONFIG } from './config';
 
-const adapter = new HttpPersistenceAdapter('/api/layout');
-
-// --- Registry ---
-const REGISTRY: Record<string, { name: string; color: string }> = {
-  'analytics': { name: 'Analytics', color: '#ff4d4d' },
-  'feed': { name: 'Live Feed', color: '#4dff4d' },
-  'chat': { name: 'Chat', color: '#4d4dff' },
-  'inspector': { name: 'Inspector', color: '#ffff4d' },
-};
+const storage = new HttpPersistenceAdapter('/api/layout');
 
 async function init() {
   const statusEl = document.getElementById('sync-status');
-  const initialState = await adapter.load();
+  const initialState = await storage.load();
   
   const engine = new LayoutEngine(initialState || undefined, {
-    persistence: adapter,
+    persistence: storage,
     saveDebounceMs: 1000
   });
 
   const sandbox = new SandboxState(engine);
   sandbox.dragHandleSelector = SANDBOX_CONFIG.dragHandleSelector;
+
+  // --- Registry ---
+  const REGISTRY: Record<string, { name: string; color: string }> = {
+    'analytics': { name: 'Analytics', color: '#ff4d4d' },
+    'feed': { name: 'Live Feed', color: '#4dff4d' },
+    'chat': { name: 'Chat', color: '#4d4dff' },
+    'inspector': { name: 'Inspector', color: '#ffff4d' },
+  };
 
   function renderPicker(tileId: string): string {
     return `
@@ -61,6 +61,7 @@ async function init() {
       const componentInfo = node.contentId ? REGISTRY[node.contentId] : null;
 
       el.innerHTML = `
+        <div class="ug-ghost-preview" style="display: none; position: absolute; background: rgba(255, 204, 0, 0.3); border: 2px solid #ffcc00; pointer-events: none; z-index: 100;"></div>
         <div class="ug-tile-header" draggable="true">
           <span style="opacity: 0.5;">${node.id.substring(0, 8)}</span>
           <span class="ug-tile-title">${componentInfo?.name || ''}</span>
@@ -145,19 +146,6 @@ async function init() {
 
   document.getElementById('close-maximize')?.addEventListener('click', () => engine.minimize());
 
-  // Shortcuts
-  document.addEventListener('keydown', (event) => {
-    if (!sandbox.focusedTileId) return;
-    if (event.ctrlKey && event.key === 'd') { event.preventDefault(); engine.split(sandbox.focusedTileId, 'horizontal'); }
-    if (event.ctrlKey && event.key === 'v') { event.preventDefault(); engine.split(sandbox.focusedTileId, 'vertical'); }
-    if (event.ctrlKey && event.key === 'x') {
-      event.preventDefault();
-      engine.removeTile(sandbox.focusedTileId);
-      const state = engine.getState();
-      sandbox.focusedTileId = state.root.type === 'tile' ? state.root.id : (state.root as any).children[0].id;
-    }
-  });
-
   // Drag-Resize
   let dragResizeState: { splitId: string; direction: Direction; rect: DOMRect } | null = null;
   document.body.addEventListener('mousedown', (e) => {
@@ -178,23 +166,60 @@ async function init() {
   });
   document.body.addEventListener('mouseup', () => { dragResizeState = null; document.body.classList.remove('dragging'); });
 
-  // Drag-Swap
+  // Drag-Swap/Move
+  let currentDropAction: DropAction | null = null;
+
   document.body.addEventListener('dragstart', (e) => {
     if (!sandbox.canStartDrag(e.target as any)) { e.preventDefault(); return; }
     const tile = (e.target as HTMLElement).closest('.ug-tile') as HTMLElement;
     if (tile) { sandbox.draggedTileId = tile.dataset.tileId!; e.dataTransfer?.setData('text/plain', sandbox.draggedTileId); }
   });
+
   document.body.addEventListener('dragover', (e) => {
     e.preventDefault();
     const tile = (e.target as HTMLElement).closest('.ug-tile') as HTMLElement;
-    document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
-    if (tile && tile.dataset.tileId !== sandbox.draggedTileId) tile.classList.add('drag-over');
+    if (tile && sandbox.draggedTileId && tile.dataset.tileId !== sandbox.draggedTileId) {
+      const rect = tile.getBoundingClientRect();
+      currentDropAction = getDropAction(rect, e.clientX, e.clientY);
+      
+      const ghost = tile.querySelector('.ug-ghost-preview') as HTMLElement;
+      if (ghost) {
+        ghost.style.display = 'block';
+        if (currentDropAction.type === 'swap') {
+          ghost.style.top = '10%'; ghost.style.left = '10%'; ghost.style.width = '80%'; ghost.style.height = '80%';
+        } else {
+          if (currentDropAction.direction === 'horizontal') {
+            ghost.style.width = '50%'; ghost.style.height = '100%'; ghost.style.top = '0';
+            ghost.style.left = currentDropAction.side === 'before' ? '0' : '50%';
+          } else {
+            ghost.style.width = '100%'; ghost.style.height = '50%'; ghost.style.left = '0';
+            ghost.style.top = currentDropAction.side === 'before' ? '0' : '50%';
+          }
+        }
+      }
+    }
   });
+
+  document.body.addEventListener('dragleave', (e) => {
+    const tile = (e.target as HTMLElement).closest('.ug-tile') as HTMLElement;
+    if (tile) {
+      const ghost = tile.querySelector('.ug-ghost-preview') as HTMLElement;
+      if (ghost) ghost.style.display = 'none';
+    }
+  });
+
   document.body.addEventListener('drop', (e) => {
     e.preventDefault();
     const tile = (e.target as HTMLElement).closest('.ug-tile') as HTMLElement;
-    if (tile) sandbox.handleDrop(tile.dataset.tileId!);
-    document.querySelectorAll('.ug-tile').forEach(el => el.classList.remove('drag-over'));
+    if (tile && sandbox.draggedTileId && tile.dataset.tileId !== sandbox.draggedTileId && currentDropAction) {
+      if (currentDropAction.type === 'swap') {
+        engine.swapTiles(sandbox.draggedTileId, tile.dataset.tileId!);
+      } else {
+        engine.moveTile(sandbox.draggedTileId, tile.dataset.tileId!, currentDropAction.direction, currentDropAction.side);
+      }
+    }
+    sandbox.draggedTileId = null;
+    document.querySelectorAll('.ug-ghost-preview').forEach(el => (el as HTMLElement).style.display = 'none');
   });
 
   engine.subscribe(() => {
