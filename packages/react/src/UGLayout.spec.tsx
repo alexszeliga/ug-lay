@@ -77,6 +77,11 @@ describe('UGLayout', () => {
       window.dispatchEvent(moveEvent);
     });
 
+    // Send a second move to actually trigger the target detection in the coordinator
+    act(() => {
+      window.dispatchEvent(moveEvent);
+    });
+
     const upEvent = new CustomEvent('pointerup', { bubbles: true }) as any;
     upEvent.clientX = 150;
     upEvent.clientY = 50;

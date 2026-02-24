@@ -4,6 +4,7 @@ import { useLayout } from '../context';
 import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET, ICON_ADD } from '../icons';
 import { ControlButton } from './ControlButton';
 import { DefaultPicker } from './DefaultPicker';
+import { useDragCoordinator } from '../hooks/useDragCoordinator';
 
 export interface TileComponentProps<TMetadata = any> {
   node: TileNode<TMetadata>;
@@ -48,8 +49,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
   const [showPicker, setShowPicker] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const dragStateRef = useRef(dragState);
-  dragStateRef.current = dragState;
+  const { startDrag } = useDragCoordinator({ engine, dragState, setDragState });
 
   const hasTabs = node.tabs && node.tabs.length > 0;
   const activeTabIndex = node.activeTabIndex ?? 0;
@@ -76,55 +76,17 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
 
     const startX = e.clientX;
     const startY = e.clientY;
-    let isDragging = false;
 
     const onPointerMove = (moveEvent: PointerEvent) => {
-      // Small threshold to avoid accidental drags
-      if (!isDragging && Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY) < 5) {
-        return;
+      const dist = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
+      if (dist > 5) {
+        window.removeEventListener('pointermove', onPointerMove);
+        startDrag(node.id, moveEvent.clientX, moveEvent.clientY);
       }
-      
-      isDragging = true;
-      
-      // Find what we are over
-      const elementOver = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      const tileOver = elementOver?.closest('.ug-tile') as HTMLElement | null;
-      let targetId: string | null = null;
-      let dropAction: DropAction | null = null;
-
-      if (tileOver) {
-        targetId = tileOver.getAttribute('data-tile-id');
-        
-        if (targetId && targetId !== node.id) {
-          const rect = tileOver.getBoundingClientRect();
-          dropAction = getDropAction(rect, moveEvent.clientX, moveEvent.clientY);
-        } else {
-          targetId = null;
-        }
-      }
-
-      setDragState({
-        id: node.id,
-        clientX: moveEvent.clientX,
-        clientY: moveEvent.clientY,
-        targetId,
-        dropAction
-      });
     };
 
-    const onPointerUp = (upEvent: PointerEvent) => {
+    const onPointerUp = () => {
       window.removeEventListener('pointermove', onPointerMove);
-      
-      const latestDragState = dragStateRef.current;
-      if (latestDragState && latestDragState.targetId && latestDragState.dropAction) {
-        if (latestDragState.dropAction.type === 'swap') {
-          engine.swapTiles(latestDragState.id, latestDragState.targetId);
-        } else {
-          engine.moveTile(latestDragState.id, latestDragState.targetId, latestDragState.dropAction.direction, latestDragState.dropAction.side);
-        }
-      }
-      
-      setDragState(null);
     };
 
     window.addEventListener('pointermove', onPointerMove);
