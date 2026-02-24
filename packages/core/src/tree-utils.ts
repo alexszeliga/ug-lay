@@ -119,3 +119,48 @@ export function recursiveSwap<T>(
   }
   return node;
 }
+
+export function recursiveMove<T>(
+  root: LayoutNode<T>,
+  sourceId: string,
+  targetId: string,
+  direction: Direction,
+  side: 'before' | 'after',
+  defaultRatio: number
+): LayoutNode<T> {
+  const sourceNode = findNode(root, sourceId) as TileNode<T>;
+  if (!sourceNode) return root;
+
+  // 1. Remove the source node from its current position
+  let newRoot = recursiveRemove(root, sourceId);
+
+  // 2. Insert the source data into a new split at the target position
+  const insertInSplit = (node: LayoutNode<T>): LayoutNode<T> => {
+    if (node.id === targetId) {
+      const newNode: LayoutNode<T> = {
+        id: uuidv4(),
+        type: 'split',
+        direction,
+        ratio: defaultRatio,
+        children: side === 'before' 
+          ? [{ ...sourceNode }, node] 
+          : [node, { ...sourceNode }]
+      };
+      return newNode;
+    }
+
+    if (node.type === 'split') {
+      return {
+        ...node,
+        children: [
+          insertInSplit(node.children[0]),
+          insertInSplit(node.children[1]),
+        ]
+      };
+    }
+
+    return node;
+  };
+
+  return insertInSplit(newRoot);
+}

@@ -80,9 +80,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
       if (action.type === 'swap') {
         engine.swapTiles(draggedId, node.id);
       } else {
-        // Edge snapping logic goes here in the NEXT step.
-        // For now, we still just swap to verify the visual.
-        engine.swapTiles(draggedId, node.id);
+        engine.moveTile(draggedId, node.id, action.direction, action.side);
       }
     }
     setDraggedId(null);

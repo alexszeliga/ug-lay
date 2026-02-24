@@ -213,4 +213,30 @@ describe('LayoutEngine', () => {
     expect(state.contentId).toBeUndefined();
     expect(state.metadata).toBeUndefined();
   });
+
+  it('should move a tile to an edge by splitting the target and removing the source', () => {
+    const engine = new LayoutEngine();
+    // 1. Create two tiles: Root -> [A, B]
+    engine.split(engine.getState().root.id, 'horizontal');
+    const rootState = engine.getState().root as any;
+    const idA = rootState.children[0].id;
+    const idB = rootState.children[1].id;
+
+    engine.updateTile(idA, { contentId: 'Source' });
+    engine.updateTile(idB, { contentId: 'Target' });
+
+    // 2. Act: Move A to the 'after' (right) edge of B
+    engine.moveTile(idA, idB, 'horizontal', 'after');
+
+    // 3. Assert
+    const finalState = engine.getState();
+    const newRoot = finalState.root as any;
+    
+    // The root split was promoted since A was removed from it.
+    // The new root is the split that was created at B's position.
+    expect(newRoot.type).toBe('split');
+    expect(newRoot.children[0].contentId).toBe('Target');
+    expect(newRoot.children[1].contentId).toBe('Source');
+    expect(newRoot.children[1].id).toBe(idA);
+  });
 });

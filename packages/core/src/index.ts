@@ -13,6 +13,7 @@ import {
   recursiveRemove,
   recursiveSplit,
   recursiveSwap,
+  recursiveMove,
 } from './tree-utils';
 
 export * from './types';
@@ -150,6 +151,19 @@ export class LayoutEngine<TMetadata = any> {
       this.state.root,
       tileId,
       direction,
+      this.config.defaultSplitRatio
+    );
+    this.notify();
+  }
+
+  moveTile(sourceId: string, targetId: string, direction: Direction, side: 'before' | 'after'): void {
+    if (sourceId === targetId) return;
+    this.state.root = recursiveMove(
+      this.state.root,
+      sourceId,
+      targetId,
+      direction,
+      side,
       this.config.defaultSplitRatio
     );
     this.notify();
