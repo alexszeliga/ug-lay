@@ -22,6 +22,6 @@
 - [ ] **Backend Real-time Sync:** Explore WebSockets (Laravel Reverb/Pusher) for real-time collaborative layout editing.
 
 ## DX & Documentation
-- [ ] **README Authoring:** Populate the stashed README stubs with project vision and technical guides.
+- [x] **README Authoring:** Populate the stashed README stubs with project vision and technical guides.
 - [x] **API Reference:** Generate automated API documentation from TypeScript types.
 - [ ] **Vue Integration:** Scaffold `@ug-lay/vue` to expand framework coverage.
