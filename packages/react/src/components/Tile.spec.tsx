@@ -84,4 +84,29 @@ describe('TileComponent Tabs', () => {
     // Picker should appear
     expect(screen.getByText('Select a Component')).toBeInTheDocument();
   });
+
+  it('should cleanup window listeners on unmount during pre-drag phase', () => {
+    const engine = new LayoutEngine();
+    vi.spyOn(window, 'addEventListener');
+    vi.spyOn(window, 'removeEventListener');
+
+    const { unmount } = render(
+      <LayoutProvider engine={engine}>
+        <TileComponent node={engine.getState().root as any} />
+      </LayoutProvider>
+    );
+
+    const header = document.querySelector('.ug-tile-header') as HTMLElement;
+    
+    // 1. MouseDown starts the "pre-drag" phase with window listeners
+    fireEvent.mouseDown(header, { button: 0, clientX: 10, clientY: 10 });
+    
+    expect(window.addEventListener).toHaveBeenCalledWith('pointermove', expect.any(Function));
+
+    // 2. Unmount component
+    unmount();
+
+    // 3. Assert that listeners were cleaned up
+    expect(window.removeEventListener).toHaveBeenCalledWith('pointermove', expect.any(Function));
+  });
 });

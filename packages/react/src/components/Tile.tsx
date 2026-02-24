@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { TileNode, getDropAction, DropAction } from '@ug-layout/core';
 import { useLayout } from '../context';
 import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET, ICON_ADD } from '../icons';
@@ -47,9 +47,31 @@ const GhostPreview: React.FC<{ action: DropAction }> = ({ action }) => {
 export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMetadata>) {
   const { registry, engine, dragState, setDragState, config } = useLayout<TMetadata>();
   const [showPicker, setShowPicker] = useState(false);
+  const [preDragInfo, setPreDragInfo] = useState<{ x: number, y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const { startDrag } = useDragCoordinator({ engine, dragState, setDragState });
+
+  useEffect(() => {
+    if (!preDragInfo) return;
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      const dist = Math.hypot(moveEvent.clientX - preDragInfo.x, moveEvent.clientY - preDragInfo.y);
+      if (dist > 5) {
+        setPreDragInfo(null);
+        startDrag(node.id, moveEvent.clientX, moveEvent.clientY);
+      }
+    };
+
+    const onPointerUp = () => setPreDragInfo(null);
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [preDragInfo, node.id, startDrag]);
 
   const hasTabs = node.tabs && node.tabs.length > 0;
   const activeTabIndex = node.activeTabIndex ?? 0;
@@ -74,23 +96,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
     // Don't start drag if clicking controls or tabs (though tabs might be draggable later)
     if ((e.target as HTMLElement).closest('.ug-controls')) return;
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      const dist = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
-      if (dist > 5) {
-        window.removeEventListener('pointermove', onPointerMove);
-        startDrag(node.id, moveEvent.clientX, moveEvent.clientY);
-      }
-    };
-
-    const onPointerUp = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-    };
-
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp, { once: true });
+    setPreDragInfo({ x: e.clientX, y: e.clientY });
   };
 
   const isTarget = dragState?.targetId === node.id;
@@ -112,6 +118,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
       <div 
         className="ug-tile-header" 
         onPointerDown={onPointerDown}
+        onMouseDown={onPointerDown}
         style={{ 
           background: 'var(--ug-header-bg, #333)', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
           display: 'grid', gridTemplateColumns: '80px 1fr 80px', alignItems: 'center',
