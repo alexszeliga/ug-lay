@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { DropAction, getDropAction, LayoutEngine } from '@ug-layout/core';
+import { DropAction, getDropAction, LayoutEngine } from '@ug-lay/core';
 import { DragState } from '../context';
 
 export interface UseDragCoordinatorProps<TMetadata = any> {

@@ -1,11 +1,11 @@
-# ug-layout/php
+# ug-lay/php
 
-PHP DTOs and validation for ug-layout.
+PHP DTOs and validation for ug-lay.
 
 ## Installation
 
 ```bash
-composer require ug-layout/php
+composer require ug-lay/php
 ```
 
 ## Usage

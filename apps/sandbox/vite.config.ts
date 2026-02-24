@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   resolve: {
     alias: {
-      '@ug-layout/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
+      '@ug-lay/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
     },
   },
 });

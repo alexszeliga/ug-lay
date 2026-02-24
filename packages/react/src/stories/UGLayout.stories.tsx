@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { LayoutProvider, UGLayout } from '../index';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 
 const SampleComponent = ({ node }: any) => (
   <div style={{ 

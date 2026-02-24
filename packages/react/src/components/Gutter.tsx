@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Direction, calculateRatio } from '@ug-layout/core';
+import { Direction, calculateRatio } from '@ug-lay/core';
 import { useLayout } from '../context';
 
 export interface GutterProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TileNode } from '@ug-layout/core';
+import { TileNode } from '@ug-lay/core';
 import { useLayout } from '../context';
 import { ICON_REMOVE } from '../icons';
 import { ControlButton } from './ControlButton';

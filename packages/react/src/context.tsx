@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useSyncExternalStore, useState } from 'react';
-import { LayoutEngine, LayoutState, TileNode, DropAction } from '@ug-layout/core';
+import { LayoutEngine, LayoutState, TileNode, DropAction } from '@ug-lay/core';
 
 export interface TileComponentProps<TMetadata = any> {
   node: TileNode<TMetadata>;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutNode } from '@ug-layout/core';
+import { LayoutNode } from '@ug-lay/core';
 import { TileComponent } from './Tile';
 import { SplitComponent } from './Split';
 

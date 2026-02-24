@@ -28,7 +28,7 @@ export function UGLayout<TMetadata = any>() {
 
   return (
     <div 
-      className="ug-layout-root" 
+      className="ug-lay-root" 
       style={{ 
         width: '100%', 
         height: '100%', 

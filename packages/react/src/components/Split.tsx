@@ -1,5 +1,5 @@
 import React from 'react';
-import { SplitNode } from '@ug-layout/core';
+import { SplitNode } from '@ug-lay/core';
 import { LayoutNodeComponent } from './LayoutNode';
 import { Gutter } from './Gutter';
 import { useLayout } from '../context';

@@ -1,8 +1,8 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / TileType
+[ug-lay](../../../README.md) / [core/src](../README.md) / TileType
 
 # Type Alias: TileType
 

@@ -1,7 +1,7 @@
 {
     "name": "apps/php-sandbox",
     "require": {
-        "ug-layout/php": "dev-master"
+        "ug-lay/php": "dev-master"
     },
     "repositories": [
         {

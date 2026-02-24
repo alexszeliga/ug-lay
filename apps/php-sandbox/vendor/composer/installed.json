@@ -1,7 +1,7 @@
 {
     "packages": [
         {
-            "name": "ug-layout/php",
+            "name": "ug-lay/php",
             "version": "dev-master",
             "version_normalized": "dev-master",
             "dist": {
@@ -27,11 +27,11 @@
             "license": [
                 "MIT"
             ],
-            "description": "PHP DTOs and validation for ug-layout",
+            "description": "PHP DTOs and validation for ug-lay",
             "transport-options": {
                 "relative": true
             },
-            "install-path": "../ug-layout/php"
+            "install-path": "../ug-lay/php"
         }
     ],
     "dev": true,

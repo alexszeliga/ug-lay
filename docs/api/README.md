@@ -1,8 +1,8 @@
-**ug-layout**
+**ug-lay**
 
 ***
 
-# ug-layout
+# ug-lay
 
 ## Modules
 

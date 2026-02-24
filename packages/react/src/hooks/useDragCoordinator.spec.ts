@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useDragCoordinator } from './useDragCoordinator';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 
 describe('useDragCoordinator cleanup', () => {
   let engine: LayoutEngine;

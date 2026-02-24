@@ -1,12 +1,12 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / LayoutEngine
+[ug-lay](../../../README.md) / [core/src](../README.md) / LayoutEngine
 
 # Class: LayoutEngine\<TMetadata\>
 
-Defined in: core/src/index.ts:32
+Defined in: core/src/index.ts:34
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: core/src/index.ts:32
 
 > **new LayoutEngine**\<`TMetadata`\>(`initialState?`, `config?`): `LayoutEngine`\<`TMetadata`\>
 
-Defined in: core/src/index.ts:38
+Defined in: core/src/index.ts:40
 
 #### Parameters
 
@@ -36,13 +36,41 @@ Defined in: core/src/index.ts:38
 
 `LayoutEngine`\<`TMetadata`\>
 
+## Accessors
+
+### dragThreshold
+
+#### Get Signature
+
+> **get** **dragThreshold**(): `number`
+
+Defined in: core/src/index.ts:55
+
+##### Returns
+
+`number`
+
+***
+
+### gutterSize
+
+#### Get Signature
+
+> **get** **gutterSize**(): `number`
+
+Defined in: core/src/index.ts:51
+
+##### Returns
+
+`number`
+
 ## Methods
 
 ### addTab()
 
 > **addTab**(`tileId`, `contentId`, `metadata?`): `void`
 
-Defined in: core/src/index.ts:137
+Defined in: core/src/index.ts:138
 
 #### Parameters
 
@@ -68,7 +96,7 @@ Defined in: core/src/index.ts:137
 
 > **getState**(): [`LayoutState`](../interfaces/LayoutState.md)\<`TMetadata`\>
 
-Defined in: core/src/index.ts:76
+Defined in: core/src/index.ts:91
 
 #### Returns
 
@@ -80,7 +108,7 @@ Defined in: core/src/index.ts:76
 
 > **maximizeTile**(`tileId`): `void`
 
-Defined in: core/src/index.ts:80
+Defined in: core/src/index.ts:95
 
 #### Parameters
 
@@ -98,7 +126,7 @@ Defined in: core/src/index.ts:80
 
 > **minimize**(): `void`
 
-Defined in: core/src/index.ts:85
+Defined in: core/src/index.ts:100
 
 #### Returns
 
@@ -110,7 +138,7 @@ Defined in: core/src/index.ts:85
 
 > **moveTile**(`sourceId`, `targetId`, `direction`, `side`): `void`
 
-Defined in: core/src/index.ts:226
+Defined in: core/src/index.ts:220
 
 #### Parameters
 
@@ -140,7 +168,7 @@ Defined in: core/src/index.ts:226
 
 > **removeTab**(`tileId`, `tabId`): `void`
 
-Defined in: core/src/index.ts:169
+Defined in: core/src/index.ts:167
 
 #### Parameters
 
@@ -162,7 +190,7 @@ Defined in: core/src/index.ts:169
 
 > **removeTile**(`tileId`): `void`
 
-Defined in: core/src/index.ts:193
+Defined in: core/src/index.ts:190
 
 #### Parameters
 
@@ -180,7 +208,7 @@ Defined in: core/src/index.ts:193
 
 > **resetTile**(`tileId`): `void`
 
-Defined in: core/src/index.ts:117
+Defined in: core/src/index.ts:120
 
 #### Parameters
 
@@ -198,7 +226,7 @@ Defined in: core/src/index.ts:117
 
 > **selectTab**(`tileId`, `index`): `void`
 
-Defined in: core/src/index.ts:127
+Defined in: core/src/index.ts:129
 
 #### Parameters
 
@@ -220,7 +248,7 @@ Defined in: core/src/index.ts:127
 
 > **setRatio**(`splitId`, `ratio`): `void`
 
-Defined in: core/src/index.ts:90
+Defined in: core/src/index.ts:105
 
 #### Parameters
 
@@ -242,7 +270,7 @@ Defined in: core/src/index.ts:90
 
 > **split**(`tileId`, `direction`): `void`
 
-Defined in: core/src/index.ts:216
+Defined in: core/src/index.ts:211
 
 #### Parameters
 
@@ -264,7 +292,7 @@ Defined in: core/src/index.ts:216
 
 > **subscribe**(`callback`): () => `void`
 
-Defined in: core/src/index.ts:49
+Defined in: core/src/index.ts:59
 
 #### Parameters
 
@@ -286,7 +314,7 @@ Defined in: core/src/index.ts:49
 
 > **swapTiles**(`sourceId`, `targetId`): `void`
 
-Defined in: core/src/index.ts:199
+Defined in: core/src/index.ts:195
 
 #### Parameters
 
@@ -308,7 +336,7 @@ Defined in: core/src/index.ts:199
 
 > **updateTile**(`tileId`, `updates`): `void`
 
-Defined in: core/src/index.ts:104
+Defined in: core/src/index.ts:113
 
 #### Parameters
 

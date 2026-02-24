@@ -11,8 +11,8 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@ug-layout/core": "workspace:*",
-    "@ug-layout/react": "workspace:*"
+    "@ug-lay/core": "workspace:*",
+    "@ug-lay/react": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

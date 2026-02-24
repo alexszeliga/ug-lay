@@ -22,8 +22,8 @@ const config: StorybookConfig = {
         ...config.resolve,
         alias: {
           ...config.resolve?.alias,
-          '@ug-layout/core': path.resolve(__dirname, '../../core/src/index.ts'),
-          '@ug-layout/react': path.resolve(__dirname, '../index.tsx'),
+          '@ug-lay/core': path.resolve(__dirname, '../../core/src/index.ts'),
+          '@ug-lay/react': path.resolve(__dirname, '../index.tsx'),
         },
       },
     };

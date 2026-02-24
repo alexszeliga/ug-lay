@@ -1,11 +1,11 @@
-# ug-layout
+# ug-lay
 
 A framework-agnostic, persistent tiling window manager for the web.
 
 ## Structure
-- `@ug-layout/core`: Reactive state machine (TypeScript).
-- `@ug-layout/react`: React integration.
-- `ug-layout/php`: Server-side DTOs and validation.
+- `@ug-lay/core`: Reactive state machine (TypeScript).
+- `@ug-lay/react`: React integration.
+- `ug-lay/php`: Server-side DTOs and validation.
 - `apps/*`: Reference implementations and sandboxes.
 
 ## Usage

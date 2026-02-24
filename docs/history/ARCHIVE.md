@@ -1,6 +1,6 @@
 # Conversation & Feature Archive
 
-## Project: ug-layout
+## Project: ug-lay
 **Initial Model:** Gemini 2.0 Flash  
 **Start Date:** Feb 23, 2026
 

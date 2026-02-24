@@ -1,8 +1,8 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [react/src](../README.md) / LayoutProvider
+[ug-lay](../../../README.md) / [react/src](../README.md) / LayoutProvider
 
 # Function: LayoutProvider()
 

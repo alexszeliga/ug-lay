@@ -36,10 +36,10 @@ importers:
 
   apps/react-sandbox:
     dependencies:
-      '@ug-layout/core':
+      '@ug-lay/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@ug-layout/react':
+      '@ug-lay/react':
         specifier: workspace:*
         version: link:../../packages/react
       react:
@@ -67,7 +67,7 @@ importers:
 
   apps/sandbox:
     dependencies:
-      '@ug-layout/core':
+      '@ug-lay/core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:
@@ -101,7 +101,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@ug-layout/core':
+      '@ug-lay/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

@@ -16,7 +16,7 @@ class ComposerStaticInitcee70a22a06b20c4ccf572a431d5e939
     public static $prefixDirsPsr4 = array (
         'UgLayout\\' =>
         array (
-            0 => __DIR__ . '/..' . '/ug-layout/php/src',
+            0 => __DIR__ . '/..' . '/ug-lay/php/src',
         ),
     );
 

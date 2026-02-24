@@ -1,4 +1,4 @@
-import { LayoutEngine, LayoutNode, Direction, TileNode, LocalStorageAdapter, getDropAction, DropAction, findNode } from '@ug-layout/core';
+import { LayoutEngine, LayoutNode, Direction, TileNode, LocalStorageAdapter, getDropAction, DropAction, findNode } from '@ug-lay/core';
 import { SandboxState } from './logic';
 import { SANDBOX_CONFIG } from './config';
 

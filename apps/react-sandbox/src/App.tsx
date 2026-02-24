@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { LayoutEngine, LocalStorageAdapter, LayoutState } from '@ug-layout/core';
-import { LayoutProvider, UGLayout } from '@ug-layout/react';
+import { LayoutEngine, LocalStorageAdapter, LayoutState } from '@ug-lay/core';
+import { LayoutProvider, UGLayout } from '@ug-lay/react';
 
 const Analytics = () => (
   <div style={{ padding: '20px', background: '#ff4d4d22', border: '1px solid #ff4d4d', height: '100%', boxSizing: 'border-box' }}>
@@ -66,7 +66,7 @@ export const App = () => {
     >
       <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ padding: '10px 20px', background: '#333', borderBottom: '1px solid #444' }}>
-          <strong>ug-layout / react-sandbox</strong>
+          <strong>ug-lay / react-sandbox</strong>
         </header>
         <main style={{ flex: 1 }}>
           <UGLayout />

@@ -1,12 +1,12 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / calculateRatio
+[ug-lay](../../../README.md) / [core/src](../README.md) / calculateRatio
 
 # Function: calculateRatio()
 
-> **calculateRatio**(`rect`, `clientX`, `clientY`, `direction`, `gutterSize?`): `number`
+> **calculateRatio**(`rect`, `clientX`, `clientY`, `direction`, `gutterSize`): `number`
 
 Defined in: core/src/geometry.ts:47
 
@@ -38,9 +38,9 @@ The direction of the split.
 
 `"horizontal"` | `"vertical"`
 
-### gutterSize?
+### gutterSize
 
-`number` = `4`
+`number`
 
 The size of the gutter in pixels.
 

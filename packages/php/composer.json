@@ -1,6 +1,6 @@
 {
-    "name": "ug-layout/php",
-    "description": "PHP DTOs and validation for ug-layout",
+    "name": "ug-lay/php",
+    "description": "PHP DTOs and validation for ug-lay",
     "type": "library",
     "license": "MIT",
     "autoload": {

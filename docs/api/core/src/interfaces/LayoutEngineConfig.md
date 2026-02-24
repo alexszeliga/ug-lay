@@ -1,8 +1,8 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / LayoutEngineConfig
+[ug-lay](../../../README.md) / [core/src](../README.md) / LayoutEngineConfig
 
 # Interface: LayoutEngineConfig\<TMetadata\>
 
@@ -21,6 +21,22 @@ Defined in: core/src/types.ts:37
 > **defaultSplitRatio**: `number`
 
 Defined in: core/src/types.ts:40
+
+***
+
+### dragThreshold?
+
+> `optional` **dragThreshold**: `number`
+
+Defined in: core/src/types.ts:42
+
+***
+
+### gutterSize?
+
+> `optional` **gutterSize**: `number`
+
+Defined in: core/src/types.ts:41
 
 ***
 
@@ -44,7 +60,7 @@ Defined in: core/src/types.ts:38
 
 > `optional` **persistence**: [`PersistenceAdapter`](PersistenceAdapter.md)\<`TMetadata`\>
 
-Defined in: core/src/types.ts:41
+Defined in: core/src/types.ts:43
 
 ***
 
@@ -52,4 +68,4 @@ Defined in: core/src/types.ts:41
 
 > `optional` **saveDebounceMs**: `number`
 
-Defined in: core/src/types.ts:42
+Defined in: core/src/types.ts:44

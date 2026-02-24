@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LayoutProvider } from '../context';
 import { TileComponent } from './Tile';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 
 describe('TileComponent Tabs', () => {
   const registry = {

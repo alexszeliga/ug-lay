@@ -1,18 +1,18 @@
-# @ug-layout/react
+# @ug-lay/react
 
-React bindings and components for ug-layout.
+React bindings and components for ug-lay.
 
 ## Installation
 
 ```bash
-npm install @ug-layout/react @ug-layout/core
+npm install @ug-lay/react @ug-lay/core
 ```
 
 ## Usage
 
 ```tsx
-import { LayoutProvider, UGLayout } from '@ug-layout/react';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutProvider, UGLayout } from '@ug-lay/react';
+import { LayoutEngine } from '@ug-lay/core';
 
 const engine = new LayoutEngine();
 const registry = {

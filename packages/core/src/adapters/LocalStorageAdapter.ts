@@ -4,7 +4,7 @@ export class LocalStorageAdapter implements PersistenceAdapter {
   private key: string;
 
   constructor(key: string) {
-    this.key = `ug-layout:${key}`;
+    this.key = `ug-lay:${key}`;
   }
 
   async save(state: LayoutState): Promise<void> {

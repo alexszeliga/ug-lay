@@ -1,8 +1,8 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [react/src](../README.md) / LayoutProviderProps
+[ug-lay](../../../README.md) / [react/src](../README.md) / LayoutProviderProps
 
 # Interface: LayoutProviderProps\<TMetadata\>
 

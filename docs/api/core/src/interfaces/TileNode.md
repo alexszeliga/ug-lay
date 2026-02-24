@@ -1,8 +1,8 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / TileNode
+[ug-lay](../../../README.md) / [core/src](../README.md) / TileNode
 
 # Interface: TileNode\<TMetadata\>
 

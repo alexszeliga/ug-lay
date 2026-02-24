@@ -22,7 +22,7 @@ describe('LocalStorageAdapter', () => {
     const adapter = new LocalStorageAdapter(mockKey);
     await adapter.save(mockState);
     
-    expect(localStorage.setItem).toHaveBeenCalledWith(`ug-layout:${mockKey}`, JSON.stringify(mockState));
+    expect(localStorage.setItem).toHaveBeenCalledWith(`ug-lay:${mockKey}`, JSON.stringify(mockState));
   });
 
   it('should load state from localStorage', async () => {
@@ -31,7 +31,7 @@ describe('LocalStorageAdapter', () => {
     const adapter = new LocalStorageAdapter(mockKey);
     const loaded = await adapter.load();
     
-    expect(localStorage.getItem).toHaveBeenCalledWith(`ug-layout:${mockKey}`);
+    expect(localStorage.getItem).toHaveBeenCalledWith(`ug-lay:${mockKey}`);
     expect(loaded).toEqual(mockState);
   });
 

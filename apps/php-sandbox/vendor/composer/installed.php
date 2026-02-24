@@ -19,12 +19,12 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'ug-layout/php' => array(
+        'ug-lay/php' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
             'reference' => '8e01761f35533f47c99a18f6bd2bf32e7dcacd96',
             'type' => 'library',
-            'install_path' => __DIR__ . '/../ug-layout/php',
+            'install_path' => __DIR__ . '/../ug-lay/php',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

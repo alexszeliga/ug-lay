@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_SERVER['REQUEST_URI'] === '/api/la
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ug-layout PHP Sandbox</title>
+    <title>ug-lay PHP Sandbox</title>
     <style>
         body { margin: 0; background: #1e1e1e; color: white; font-family: sans-serif; }
         #app { width: 100vw; height: 90vh; border-bottom: 1px solid #444; }

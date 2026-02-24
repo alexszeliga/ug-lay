@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'UgLayout\\' => array($vendorDir . '/ug-layout/php/src'),
+    'UgLayout\\' => array($vendorDir . '/ug-lay/php/src'),
 );

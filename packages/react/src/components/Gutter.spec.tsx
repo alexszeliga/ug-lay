@@ -3,7 +3,7 @@ import { render, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Gutter } from './Gutter';
 import { LayoutProvider } from '../context';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 
 describe('Gutter cleanup', () => {
   let engine: LayoutEngine;

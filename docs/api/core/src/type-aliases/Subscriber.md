@@ -1,14 +1,14 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / Subscriber
+[ug-lay](../../../README.md) / [core/src](../README.md) / Subscriber
 
 # Type Alias: Subscriber()\<TMetadata\>
 
 > **Subscriber**\<`TMetadata`\> = (`state`) => `void`
 
-Defined in: core/src/types.ts:50
+Defined in: core/src/types.ts:52
 
 ## Type Parameters
 

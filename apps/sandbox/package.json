@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ug-layout/core": "workspace:*"
+    "@ug-lay/core": "workspace:*"
   },
   "devDependencies": {
     "@vitest/browser": "^4.0.18",

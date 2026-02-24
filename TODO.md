@@ -1,4 +1,4 @@
-# ug-layout TODO List
+# ug-lay TODO List
 
 ## Interaction & UX
 - [x] **Visual Cues:** Implement a "Ghost Preview" or drop-zone highlighting to show where a tile will land during drag-and-drop.
@@ -24,4 +24,4 @@
 ## DX & Documentation
 - [ ] **README Authoring:** Populate the stashed README stubs with project vision and technical guides.
 - [x] **API Reference:** Generate automated API documentation from TypeScript types.
-- [ ] **Vue Integration:** Scaffold `@ug-layout/vue` to expand framework coverage.
+- [ ] **Vue Integration:** Scaffold `@ug-lay/vue` to expand framework coverage.

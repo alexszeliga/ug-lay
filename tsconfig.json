@@ -14,8 +14,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@ug-layout/core": ["packages/core/src/index.ts"],
-      "@ug-layout/react": ["packages/react/src/index.tsx"]
+      "@ug-lay/core": ["packages/core/src/index.ts"],
+      "@ug-lay/react": ["packages/react/src/index.tsx"]
     }
   }
 }

@@ -10,8 +10,8 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@ug-layout/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
-      '@ug-layout/react': path.resolve(__dirname, '../../packages/react/src/index.tsx'),
+      '@ug-lay/core': path.resolve(__dirname, '../../packages/core/src/index.ts'),
+      '@ug-lay/react': path.resolve(__dirname, '../../packages/react/src/index.tsx'),
     },
   },
   server: {

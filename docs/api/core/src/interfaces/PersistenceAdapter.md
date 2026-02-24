@@ -1,12 +1,12 @@
-[**ug-layout**](../../../README.md)
+[**ug-lay**](../../../README.md)
 
 ***
 
-[ug-layout](../../../README.md) / [core/src](../README.md) / PersistenceAdapter
+[ug-lay](../../../README.md) / [core/src](../README.md) / PersistenceAdapter
 
 # Interface: PersistenceAdapter\<TMetadata\>
 
-Defined in: core/src/types.ts:45
+Defined in: core/src/types.ts:47
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: core/src/types.ts:45
 
 > **load**(): `Promise`\<[`LayoutState`](LayoutState.md)\<`TMetadata`\> \| `null`\>
 
-Defined in: core/src/types.ts:47
+Defined in: core/src/types.ts:49
 
 #### Returns
 
@@ -32,7 +32,7 @@ Defined in: core/src/types.ts:47
 
 > **save**(`state`): `Promise`\<`void`\>
 
-Defined in: core/src/types.ts:46
+Defined in: core/src/types.ts:48
 
 #### Parameters
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { TileNode, getDropAction, DropAction } from '@ug-layout/core';
+import { TileNode, getDropAction, DropAction } from '@ug-lay/core';
 import { useLayout } from '../context';
 import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET, ICON_ADD } from '../icons';
 import { ControlButton } from './ControlButton';

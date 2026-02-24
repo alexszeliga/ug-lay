@@ -1,4 +1,4 @@
-import { LayoutNode, TileNode } from '@ug-layout/core';
+import { LayoutNode, TileNode } from '@ug-lay/core';
 
 export function findTile(node: LayoutNode, id: string): TileNode | null {
   if (node.id === id && node.type === 'tile') return node;

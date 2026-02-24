@@ -1,4 +1,4 @@
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 
 export class SandboxState {
   focusedTileId: string | null = null;

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { findTile } from './utils';
-import { LayoutNode } from '@ug-layout/core';
+import { LayoutNode } from '@ug-lay/core';
 
 describe('React Utils: findTile', () => {
   it('should find a tile by ID at the root', () => {

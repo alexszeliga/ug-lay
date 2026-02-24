@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'ug-layout/php',
+        'name' => 'ug-lay/php',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
         'reference' => '79e4553b666d511ca77170a882c43877a71e5bc8',
@@ -10,7 +10,7 @@
         'dev' => true,
     ),
     'versions' => array(
-        'ug-layout/php' => array(
+        'ug-lay/php' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
             'reference' => '79e4553b666d511ca77170a882c43877a71e5bc8',

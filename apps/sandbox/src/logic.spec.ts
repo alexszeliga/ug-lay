@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { LayoutEngine } from '@ug-layout/core';
+import { LayoutEngine } from '@ug-lay/core';
 import { SandboxState } from './logic';
 
 describe('Sandbox Logic', () => {
