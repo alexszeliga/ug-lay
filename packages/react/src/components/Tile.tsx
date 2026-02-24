@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TileNode } from '@ug-layout/core';
+import React, { useState, useRef } from 'react';
+import { TileNode, getDropAction, DropAction } from '@ug-layout/core';
 import { useLayout } from '../context';
 import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET } from '../icons';
 import { ControlButton } from './ControlButton';
@@ -9,9 +9,42 @@ export interface TileComponentProps<TMetadata = any> {
   node: TileNode<TMetadata>;
 }
 
+const GhostPreview: React.FC<{ action: DropAction }> = ({ action }) => {
+  const style: React.CSSProperties = {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 204, 0, 0.3)',
+    border: '2px solid #ffcc00',
+    pointerEvents: 'none',
+    zIndex: 100,
+    transition: 'all 0.1s ease-out',
+  };
+
+  if (action.type === 'swap') {
+    style.top = '10%';
+    style.left = '10%';
+    style.width = '80%';
+    style.height = '80%';
+  } else {
+    if (action.direction === 'horizontal') {
+      style.width = '50%';
+      style.height = '100%';
+      style.top = 0;
+      style.left = action.side === 'before' ? 0 : '50%';
+    } else {
+      style.width = '100%';
+      style.height = '50%';
+      style.left = 0;
+      style.top = action.side === 'before' ? 0 : '50%';
+    }
+  }
+
+  return <div className="ug-ghost-preview" style={style} />;
+};
+
 export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMetadata>) {
   const { registry, engine, setDraggedId, draggedId, config } = useLayout<TMetadata>();
-  const [isOver, setIsOver] = useState(false);
+  const [dropAction, setDropAction] = useState<DropAction | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const Component = node.contentId && registry ? (registry[node.contentId] as React.ComponentType<TileComponentProps<TMetadata>>) : null;
 
   const icons = {
@@ -29,34 +62,47 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (draggedId && draggedId !== node.id) setIsOver(true);
+    if (!draggedId || draggedId === node.id || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const action = getDropAction(rect, e.clientX, e.clientY);
+    setDropAction(action);
   };
 
-  const onDragLeave = () => setIsOver(false);
+  const onDragLeave = () => setDropAction(null);
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsOver(false);
-    if (draggedId && draggedId !== node.id) {
-      engine.swapTiles(draggedId, node.id);
+    const action = dropAction;
+    setDropAction(null);
+
+    if (draggedId && draggedId !== node.id && action) {
+      if (action.type === 'swap') {
+        engine.swapTiles(draggedId, node.id);
+      } else {
+        // Edge snapping logic goes here in the NEXT step.
+        // For now, we still just swap to verify the visual.
+        engine.swapTiles(draggedId, node.id);
+      }
     }
     setDraggedId(null);
   };
 
-  const borderStyle = isOver ? 'var(--ug-tile-border-dragover, 2px solid #ffcc00)' : 'var(--ug-tile-border, 1px solid #444)';
-
   return (
     <div 
+      ref={containerRef}
       className="ug-tile" 
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       style={{ 
         width: '100%', height: '100%', display: 'flex', flexDirection: 'column', 
-        boxSizing: 'border-box', border: borderStyle, overflow: 'hidden',
-        backgroundColor: 'var(--ug-tile-bg, #2a2a2a)'
+        boxSizing: 'border-box', border: 'var(--ug-tile-border, 1px solid #444)', overflow: 'hidden',
+        backgroundColor: 'var(--ug-tile-bg, #2a2a2a)',
+        position: 'relative'
       }}
     >
+      {dropAction && <GhostPreview action={dropAction} />}
       <div 
         className="ug-tile-header" 
         draggable 

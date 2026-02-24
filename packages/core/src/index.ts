@@ -16,7 +16,7 @@ import {
 } from './tree-utils';
 
 export * from './types';
-export { findNode } from './tree-utils';
+export { findNode, getDropAction } from './tree-utils';
 export { LocalStorageAdapter } from './adapters/LocalStorageAdapter';
 export { HttpPersistenceAdapter } from './adapters/HttpPersistenceAdapter';
 

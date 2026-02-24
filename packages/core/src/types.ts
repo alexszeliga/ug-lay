@@ -40,3 +40,7 @@ export interface PersistenceAdapter<TMetadata = any> {
 }
 
 export type Subscriber<TMetadata = any> = (state: LayoutState<TMetadata>) => void;
+
+export type DropAction = 
+  | { type: 'swap' }
+  | { type: 'split'; direction: Direction; side: 'before' | 'after' };

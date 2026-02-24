@@ -42,3 +42,27 @@ describe('Layout Geometry Calculations', () => {
     expect(newRatio).toBeCloseTo(0.5, 2);
   });
 });
+
+describe('Drop Position Logic', () => {
+  const rect = { width: 400, height: 400, left: 0, top: 0 };
+
+  it('should identify a SWAP when in the center', async () => {
+    const { getDropAction } = await import('./tree-utils');
+    const action = getDropAction(rect, 200, 200); // Dead center
+    expect(action.type).toBe('swap');
+  });
+
+  it('should identify a SPLIT when near an edge', async () => {
+    const { getDropAction } = await import('./tree-utils');
+    
+    const leftEdge = getDropAction(rect, 10, 200);
+    expect(leftEdge.type).toBe('split');
+    expect(leftEdge.direction).toBe('horizontal');
+    expect(leftEdge.side).toBe('before');
+
+    const topEdge = getDropAction(rect, 200, 10);
+    expect(topEdge.type).toBe('split');
+    expect(topEdge.direction).toBe('vertical');
+    expect(topEdge.side).toBe('before');
+  });
+});
