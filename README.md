@@ -19,7 +19,7 @@ pnpm build
 ```bash
 pnpm --filter sandbox dev
 pnpm --filter react-sandbox dev
-pnpm --filter php-sandbox dev
+pnpm sandbox:php
 ```
 
 ## Documentation
