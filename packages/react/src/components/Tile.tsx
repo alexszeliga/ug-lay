@@ -1,15 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { TileNode, getDropAction, DropAction } from '@ug-layout/core';
 import { useLayout } from '../context';
-import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET } from '../icons';
+import { ICON_MAXIMIZE, ICON_SPLIT_H, ICON_SPLIT_V, ICON_REMOVE, ICON_RESET, ICON_ADD } from '../icons';
 import { ControlButton } from './ControlButton';
 import { DefaultPicker } from './DefaultPicker';
 
 export interface TileComponentProps<TMetadata = any> {
   node: TileNode<TMetadata>;
+  tabId?: string;
 }
 
 const GhostPreview: React.FC<{ action: DropAction }> = ({ action }) => {
+// ... existing GhostPreview implementation (no changes needed)
   const style: React.CSSProperties = {
     position: 'absolute',
     backgroundColor: 'rgba(255, 204, 0, 0.3)',
@@ -42,10 +44,19 @@ const GhostPreview: React.FC<{ action: DropAction }> = ({ action }) => {
 };
 
 export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMetadata>) {
-  const { registry, engine, setDraggedId, draggedId, config } = useLayout<TMetadata>();
-  const [dropAction, setDropAction] = useState<DropAction | null>(null);
+  const { registry, engine, dragState, setDragState, config } = useLayout<TMetadata>();
+  const [showPicker, setShowPicker] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const Component = node.contentId && registry ? (registry[node.contentId] as React.ComponentType<TileComponentProps<TMetadata>>) : null;
+  
+  const dragStateRef = useRef(dragState);
+  dragStateRef.current = dragState;
+
+  const hasTabs = node.tabs && node.tabs.length > 0;
+  const activeTabIndex = node.activeTabIndex ?? 0;
+  const activeTab = hasTabs ? node.tabs![activeTabIndex] : null;
+  
+  const contentId = activeTab ? activeTab.contentId : node.contentId;
+  const Component = contentId && registry ? (registry[contentId] as React.ComponentType<TileComponentProps<TMetadata>>) : null;
 
   const icons = {
     maximize: config?.icons?.maximize || ICON_MAXIMIZE,
@@ -53,67 +64,141 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
     splitV: config?.icons?.splitV || ICON_SPLIT_V,
     remove: config?.icons?.remove || ICON_REMOVE,
     reset: config?.icons?.reset || ICON_RESET,
+    add: config?.icons?.add || ICON_ADD,
   };
 
-  const onDragStart = (e: React.DragEvent) => {
-    setDraggedId(node.id);
-    e.dataTransfer.setData('text/plain', node.id);
-  };
+  const onPointerDown = (e: React.PointerEvent) => {
+    // Only handle primary pointer button
+    if (e.button !== 0) return;
+    
+    // Don't start drag if clicking controls or tabs (though tabs might be draggable later)
+    if ((e.target as HTMLElement).closest('.ug-controls')) return;
 
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!draggedId || draggedId === node.id || !containerRef.current) return;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    let isDragging = false;
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const action = getDropAction(rect, e.clientX, e.clientY);
-    setDropAction(action);
-  };
-
-  const onDragLeave = () => setDropAction(null);
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const action = dropAction;
-    setDropAction(null);
-
-    if (draggedId && draggedId !== node.id && action) {
-      if (action.type === 'swap') {
-        engine.swapTiles(draggedId, node.id);
-      } else {
-        engine.moveTile(draggedId, node.id, action.direction, action.side);
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      // Small threshold to avoid accidental drags
+      if (!isDragging && Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY) < 5) {
+        return;
       }
-    }
-    setDraggedId(null);
+      
+      isDragging = true;
+      
+      // Find what we are over
+      const elementOver = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+      const tileOver = elementOver?.closest('.ug-tile') as HTMLElement | null;
+      let targetId: string | null = null;
+      let dropAction: DropAction | null = null;
+
+      if (tileOver) {
+        targetId = tileOver.getAttribute('data-tile-id');
+        
+        if (targetId && targetId !== node.id) {
+          const rect = tileOver.getBoundingClientRect();
+          dropAction = getDropAction(rect, moveEvent.clientX, moveEvent.clientY);
+        } else {
+          targetId = null;
+        }
+      }
+
+      setDragState({
+        id: node.id,
+        clientX: moveEvent.clientX,
+        clientY: moveEvent.clientY,
+        targetId,
+        dropAction
+      });
+    };
+
+    const onPointerUp = (upEvent: PointerEvent) => {
+      window.removeEventListener('pointermove', onPointerMove);
+      
+      const latestDragState = dragStateRef.current;
+      if (latestDragState && latestDragState.targetId && latestDragState.dropAction) {
+        if (latestDragState.dropAction.type === 'swap') {
+          engine.swapTiles(latestDragState.id, latestDragState.targetId);
+        } else {
+          engine.moveTile(latestDragState.id, latestDragState.targetId, latestDragState.dropAction.direction, latestDragState.dropAction.side);
+        }
+      }
+      
+      setDragState(null);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp, { once: true });
   };
+
+  const isTarget = dragState?.targetId === node.id;
 
   return (
     <div 
       ref={containerRef}
       className="ug-tile" 
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      data-tile-id={node.id}
       style={{ 
         width: '100%', height: '100%', display: 'flex', flexDirection: 'column', 
         boxSizing: 'border-box', border: 'var(--ug-tile-border, 1px solid #444)', overflow: 'hidden',
         backgroundColor: 'var(--ug-tile-bg, #2a2a2a)',
-        position: 'relative'
+        position: 'relative',
+        opacity: dragState?.id === node.id ? 0.5 : 1
       }}
     >
-      {dropAction && <GhostPreview action={dropAction} />}
+      {isTarget && dragState?.dropAction && <GhostPreview action={dragState.dropAction} />}
       <div 
         className="ug-tile-header" 
-        draggable 
-        onDragStart={onDragStart}
+        onPointerDown={onPointerDown}
         style={{ 
           background: 'var(--ug-header-bg, #333)', padding: '4px 8px', cursor: 'grab', fontSize: '11px', 
           display: 'grid', gridTemplateColumns: '80px 1fr 80px', alignItems: 'center',
-          borderBottom: 'var(--ug-header-border-bottom, 1px solid #444)', color: 'var(--ug-header-text, #888)'
+          borderBottom: 'var(--ug-header-border-bottom, 1px solid #444)', color: 'var(--ug-header-text, #888)',
+          userSelect: 'none',
+          touchAction: 'none' // Crucial for touch dragging
         }}
       >
         <span style={{ opacity: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.id.substring(0, 8)}</span>
-        <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.contentId || ''}</span>
+        
+        {/* Tab Bar or Title */}
+        <div style={{ display: 'flex', gap: '4px', overflow: 'hidden', height: '100%', alignItems: 'center', padding: '0 8px' }}>
+          {hasTabs ? (
+            node.tabs!.map((tab, idx) => (
+              <div 
+                key={tab.id}
+                onClick={(e) => { e.stopPropagation(); engine.selectTab(node.id, idx); }}
+                style={{
+                  padding: '2px 8px',
+                  borderRadius: '3px 3px 0 0',
+                  background: idx === activeTabIndex ? 'var(--ug-tile-bg, #2a2a2a)' : 'transparent',
+                  color: idx === activeTabIndex ? 'var(--ug-header-title, #ccc)' : 'inherit',
+                  cursor: 'pointer',
+                  fontSize: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  border: idx === activeTabIndex ? '1px solid var(--ug-header-border-bottom, #444)' : '1px solid transparent',
+                  borderBottom: 'none',
+                }}
+              >
+                {tab.contentId}
+                <span 
+                  onClick={(e) => { e.stopPropagation(); engine.removeTab(node.id, tab.id); }}
+                  style={{ opacity: 0.5, fontSize: '12px' }}
+                >
+                  ×
+                </span>
+              </div>
+            ))
+          ) : (
+            <span style={{ fontWeight: 'bold', color: 'var(--ug-header-title, #ccc)', textAlign: 'center', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {node.contentId || ''}
+            </span>
+          )}
+        </div>
+
         <div className="ug-controls" style={{ display: 'flex', gap: '2px', justifyContent: 'flex-end' }}>
+          <ControlButton onClick={() => setShowPicker(!showPicker)} title="Add Tab">{icons.add}</ControlButton>
           <ControlButton onClick={() => engine.resetTile(node.id)} title="Reset">{icons.reset}</ControlButton>
           <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{icons.maximize}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{icons.splitH}</ControlButton>
@@ -122,7 +207,15 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
         </div>
       </div>
       <div className="ug-tile-content" style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {Component ? <Component node={node} /> : <DefaultPicker tileId={node.id} />}
+        {showPicker || (!Component && !hasTabs) ? (
+          <DefaultPicker 
+            tileId={node.id} 
+            onSelect={() => setShowPicker(false)} 
+            asTab={hasTabs || !!node.contentId} 
+          />
+        ) : (
+          Component && <Component node={node} tabId={activeTab?.id} />
+        )}
       </div>
     </div>
   );

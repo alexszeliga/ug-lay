@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from 'react';
-import { Direction } from '@ug-layout/core';
+import { Direction, calculateRatio } from '@ug-layout/core';
 import { useLayout } from '../context';
 
 export interface GutterProps {
@@ -20,15 +20,9 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
     if (!parent) return;
 
     const rect = parent.getBoundingClientRect();
-    const gutterSize = 4;
 
     const onPointerMove = (moveEvent: PointerEvent) => {
-      let newRatio;
-      if (direction === 'horizontal') {
-        newRatio = (moveEvent.clientX - rect.left - gutterSize / 2) / (rect.width - gutterSize);
-      } else {
-        newRatio = (moveEvent.clientY - rect.top - gutterSize / 2) / (rect.height - gutterSize);
-      }
+      const newRatio = calculateRatio(rect, moveEvent.clientX, moveEvent.clientY, direction);
       engine.setRatio(splitId, newRatio);
     };
 

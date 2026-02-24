@@ -239,4 +239,69 @@ describe('LayoutEngine', () => {
     expect(newRoot.children[1].contentId).toBe('Source');
     expect(newRoot.children[1].id).toBe(idA);
   });
+
+  describe('Tab Management', () => {
+    it('should add a tab and convert single content to tabs', () => {
+      const engine = new LayoutEngine();
+      const rootId = engine.getState().root.id;
+      
+      engine.updateTile(rootId, { contentId: 'widget-1', metadata: { x: 1 } });
+      engine.addTab(rootId, 'widget-2', { x: 2 });
+
+      const state = engine.getState().root as any;
+      expect(state.tabs).toHaveLength(2);
+      expect(state.tabs[0].contentId).toBe('widget-1');
+      expect(state.tabs[1].contentId).toBe('widget-2');
+      expect(state.activeTabIndex).toBe(1);
+      // Legacy fields should be cleared
+      expect(state.contentId).toBeUndefined();
+      expect(state.metadata).toBeUndefined();
+    });
+
+    it('should allow selecting a tab', () => {
+      const engine = new LayoutEngine();
+      const rootId = engine.getState().root.id;
+      
+      engine.addTab(rootId, 'w1');
+      engine.addTab(rootId, 'w2');
+      
+      expect((engine.getState().root as any).activeTabIndex).toBe(1);
+      
+      engine.selectTab(rootId, 0);
+      expect((engine.getState().root as any).activeTabIndex).toBe(0);
+    });
+
+    it('should remove a tab and update active index', () => {
+      const engine = new LayoutEngine();
+      const rootId = engine.getState().root.id;
+      
+      engine.addTab(rootId, 'w1');
+      engine.addTab(rootId, 'w2');
+      engine.addTab(rootId, 'w3');
+      
+      const tab2Id = (engine.getState().root as any).tabs[1].id;
+      
+      engine.removeTab(rootId, tab2Id);
+      
+      const state = engine.getState().root as any;
+      expect(state.tabs).toHaveLength(2);
+      expect(state.tabs[0].contentId).toBe('w1');
+      expect(state.tabs[1].contentId).toBe('w3');
+      expect(state.activeTabIndex).toBe(1); // Should point to w3 now
+    });
+
+    it('should reset tile when last tab is removed', () => {
+      const engine = new LayoutEngine();
+      const rootId = engine.getState().root.id;
+      
+      engine.addTab(rootId, 'w1');
+      const tabId = (engine.getState().root as any).tabs[0].id;
+      
+      engine.removeTab(rootId, tabId);
+      
+      const state = engine.getState().root as any;
+      expect(state.tabs).toBeUndefined();
+      expect(state.contentId).toBeUndefined();
+    });
+  });
 });

@@ -17,6 +17,7 @@ import {
 } from './tree-utils';
 
 export * from './types';
+export * from './geometry';
 export { findNode, getDropAction } from './tree-utils';
 export { LocalStorageAdapter } from './adapters/LocalStorageAdapter';
 export { HttpPersistenceAdapter } from './adapters/HttpPersistenceAdapter';
@@ -117,7 +118,73 @@ export class LayoutEngine<TMetadata = any> {
     this.state.root = recursiveUpdate(
       this.state.root,
       tileId,
-      { contentId: undefined, metadata: undefined },
+      { contentId: undefined, metadata: undefined, tabs: undefined, activeTabIndex: undefined },
+      'tile'
+    );
+    this.notify();
+  }
+
+  selectTab(tileId: string, index: number): void {
+    this.state.root = recursiveUpdate(
+      this.state.root,
+      tileId,
+      { activeTabIndex: index },
+      'tile'
+    );
+    this.notify();
+  }
+
+  addTab(tileId: string, contentId: string, metadata?: TMetadata): void {
+    const node = findNode(this.state.root, tileId) as TileNode<TMetadata>;
+    if (!node || node.type !== 'tile') return;
+
+    const newTab = { id: uuidv4(), contentId, metadata };
+    let tabs = node.tabs ? [...node.tabs, newTab] : [];
+    
+    // If no tabs exist, but it has content, convert content to first tab
+    if (!node.tabs && node.contentId) {
+      tabs = [
+        { id: uuidv4(), contentId: node.contentId, metadata: node.metadata },
+        newTab
+      ];
+    } else if (!node.tabs) {
+      tabs = [newTab];
+    }
+
+    this.state.root = recursiveUpdate(
+      this.state.root,
+      tileId,
+      { 
+        tabs, 
+        activeTabIndex: tabs.length - 1,
+        // Clear legacy single-content fields when moving to tabs
+        contentId: undefined,
+        metadata: undefined
+      },
+      'tile'
+    );
+    this.notify();
+  }
+
+  removeTab(tileId: string, tabId: string): void {
+    const node = findNode(this.state.root, tileId) as TileNode<TMetadata>;
+    if (!node || !node.tabs) return;
+
+    const newTabs = node.tabs.filter(t => t.id !== tabId);
+    if (newTabs.length === 0) {
+      this.resetTile(tileId);
+      return;
+    }
+
+    let activeIndex = node.activeTabIndex ?? 0;
+    if (activeIndex >= newTabs.length) {
+      activeIndex = newTabs.length - 1;
+    }
+
+    this.state.root = recursiveUpdate(
+      this.state.root,
+      tileId,
+      { tabs: newTabs, activeTabIndex: activeIndex },
       'tile'
     );
     this.notify();

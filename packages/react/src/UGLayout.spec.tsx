@@ -33,7 +33,7 @@ describe('UGLayout', () => {
     expect(screen.getByText(/Select a Component/i)).toBeInTheDocument();
   });
 
-  it('should trigger a swap when dragging one tile onto another', () => {
+  it('should trigger a swap when dragging one tile onto another using PointerEvents', () => {
     const engine = new LayoutEngine();
     const rootId = engine.getState().root.id;
     engine.split(rootId, 'horizontal');
@@ -53,16 +53,36 @@ describe('UGLayout', () => {
     const tiles = document.querySelectorAll('.ug-tile-header');
     const source = tiles[0];
     const target = tiles[1];
+    const targetTile = target.closest('.ug-tile') as HTMLElement;
+    
+    // Mocking document.elementFromPoint to return our target tile
+    document.elementFromPoint = vi.fn().mockReturnValue(targetTile);
+    targetTile.getBoundingClientRect = vi.fn().mockReturnValue({
+      left: 100, top: 0, width: 100, height: 100
+    } as DOMRect);
 
-    const dataTransfer = {
-      setData: vi.fn(),
-      getData: vi.fn(),
-    };
+    const downEvent = new CustomEvent('pointerdown', { bubbles: true }) as any;
+    downEvent.button = 0;
+    downEvent.clientX = 10;
+    downEvent.clientY = 10;
+    act(() => {
+      fireEvent(source, downEvent);
+    });
+    
+    // Trigger move to exceed threshold (5px)
+    const moveEvent = new CustomEvent('pointermove', { bubbles: true }) as any;
+    moveEvent.clientX = 150;
+    moveEvent.clientY = 50;
+    act(() => {
+      window.dispatchEvent(moveEvent);
+    });
 
-    // Use fireEvent which is better for React tests
-    fireEvent.dragStart(source, { dataTransfer });
-    fireEvent.dragOver(target);
-    fireEvent.drop(target);
+    const upEvent = new CustomEvent('pointerup', { bubbles: true }) as any;
+    upEvent.clientX = 150;
+    upEvent.clientY = 50;
+    act(() => {
+      window.dispatchEvent(upEvent);
+    });
 
     expect(swapSpy).toHaveBeenCalledWith(idA, idB);
   });
@@ -94,7 +114,7 @@ describe('UGLayout', () => {
     
     // Section 3: Controls
     const controls = header?.children[2];
-    expect(controls?.children).toHaveLength(5); // Reset, Maximize, SplitH, SplitV, Remove
+    expect(controls?.children).toHaveLength(6); // Add, Reset, Maximize, SplitH, SplitV, Remove
   });
 
   it('should render a maximized overlay when a tile is maximized', () => {

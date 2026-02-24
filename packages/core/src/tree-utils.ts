@@ -1,20 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import { LayoutNode, TileNode, Direction, TileType, DropAction } from './types';
+import { normalizeCoordinates, Rect } from './geometry';
 
 export function getDropAction(
-  rect: { width: number; height: number; left: number; top: number },
+  rect: Rect,
   mouseX: number,
   mouseY: number
 ): DropAction {
   const threshold = 0.25; // Outer 25% of the tile triggers a split
   
-  const relX = (mouseX - rect.left) / rect.width;
-  const relY = (mouseY - rect.top) / rect.height;
+  const { x, y } = normalizeCoordinates(rect, mouseX, mouseY);
 
-  if (relX < threshold) return { type: 'split', direction: 'horizontal', side: 'before' };
-  if (relX > 1 - threshold) return { type: 'split', direction: 'horizontal', side: 'after' };
-  if (relY < threshold) return { type: 'split', direction: 'vertical', side: 'before' };
-  if (relY > 1 - threshold) return { type: 'split', direction: 'vertical', side: 'after' };
+  if (x < threshold) return { type: 'split', direction: 'horizontal', side: 'before' };
+  if (x > 1 - threshold) return { type: 'split', direction: 'horizontal', side: 'after' };
+  if (y < threshold) return { type: 'split', direction: 'vertical', side: 'before' };
+  if (y > 1 - threshold) return { type: 'split', direction: 'vertical', side: 'after' };
 
   return { type: 'swap' };
 }

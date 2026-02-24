@@ -6,10 +6,18 @@ export interface BaseNode {
   type: TileType;
 }
 
+export interface TileTab<TMetadata = any> {
+  id: string;
+  contentId: string;
+  metadata?: TMetadata;
+}
+
 export interface TileNode<TMetadata = any> extends BaseNode {
   type: 'tile';
-  contentId?: string;
-  metadata?: TMetadata;
+  contentId?: string; // Legacy/Single-mode
+  metadata?: TMetadata; // Legacy/Single-mode
+  tabs?: TileTab<TMetadata>[];
+  activeTabIndex?: number;
 }
 
 export interface SplitNode<TMetadata = any> extends BaseNode {
