@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs:generate": "typedoc",
-    "sandbox:php": "pnpm --filter php-sandbox-frontend dev"
+    "sandboxes:all": "pnpm --filter \"*sandbox*\" --parallel dev"
   },
   "keywords": [],
   "author": "",

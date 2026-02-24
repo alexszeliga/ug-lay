@@ -16,10 +16,19 @@ pnpm build
 ```
 
 ### Sandboxes
+
+There are three sandbox projects that show how one would implement the core package in pure Vanilla TS, with React and in a PHP web server environment. Run them with the following commands.
+
 ```bash
 pnpm --filter sandbox dev
 pnpm --filter react-sandbox dev
-pnpm sandbox:php
+pnpm --filter php-sandbox-frontend dev
+```
+
+...or...
+
+```bash
+pnpm sandboxes:all
 ```
 
 ## Documentation
