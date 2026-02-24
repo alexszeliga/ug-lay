@@ -22,5 +22,6 @@ The layout is managed as a **Recursive Binary Tree**.
 - **State Machine:** Pure logic in `@ug-layout/core` handles tree transformations.
 - **Type Safety:** High-level generics allow users to type their own `TMetadata`.
 - **Reactivity:** Pub-Sub implementation allows any renderer to subscribe to state changes.
+- **Themeable:** "Headless but Pre-styled" approach. Functional layout is built-in, but aesthetics (colors, icons, borders) are delegated to CSS Variables and application-level configuration.
 - **Persistence:** Plug-and-play Adapter pattern (LocalStorage, HTTP) with built-in debouncing.
 - **Backend:** PHP DTO layer ensures type-safe persistence and validation.
