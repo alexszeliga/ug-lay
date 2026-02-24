@@ -2,14 +2,16 @@ import React from 'react';
 import { SplitNode } from '@ug-layout/core';
 import { LayoutNodeComponent } from './LayoutNode';
 import { Gutter } from './Gutter';
+import { useLayout } from '../context';
 
 export interface SplitComponentProps<TMetadata = any> {
   node: SplitNode<TMetadata>;
 }
 
 export function SplitComponent<TMetadata = any>({ node }: SplitComponentProps<TMetadata>) {
+  const { engine } = useLayout();
   const r = node.ratio;
-  const gutterSize = 4;
+  const gutterSize = engine.gutterSize;
   const style: React.CSSProperties = {
     display: 'grid',
     width: '100%',

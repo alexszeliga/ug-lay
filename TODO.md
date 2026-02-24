@@ -10,8 +10,8 @@
 - [ ] **Window Pop-outs:** Research and implement native browser window pop-outs for multi-monitor support.
 
 ## Test Coverage Reinforcement
-- [ ] **Persistence Hardening:** Add unit tests for `LocalStorageAdapter` and `HttpPersistenceAdapter` (mocking storage/fetch).
-- [ ] **Deep Tree Logic:** Expand tests for `recursiveMove` and `recursiveRemove` to cover deeply nested structures.
+- [x] **Persistence Hardening:** Add unit tests for `LocalStorageAdapter` and `HttpPersistenceAdapter` (mocking storage/fetch).
+- [x] **Deep Tree Logic:** Expand tests for `recursiveMove` and `recursiveRemove` to cover deeply nested structures.
 - [x] **Resizing Integration:** Add a test verifying the full resize flow (Gutter -> PointerMove -> Engine).
 - [x] **Interaction Cleanup:** Verify window listeners are correctly removed in `useDragCoordinator` and `Gutter`.
 - [x] **React Utils:** Add tests for `packages/react/src/utils.ts`.

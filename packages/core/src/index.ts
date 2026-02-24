@@ -26,6 +26,8 @@ const DEFAULT_CONFIG: LayoutEngineConfig = {
   minRatio: 0.05,
   maxRatio: 0.95,
   defaultSplitRatio: 0.5,
+  gutterSize: 4,
+  dragThreshold: 5,
   saveDebounceMs: 500,
 };
 
@@ -46,6 +48,14 @@ export class LayoutEngine<TMetadata = any> {
     };
   }
 
+  get gutterSize(): number {
+    return this.config.gutterSize ?? 4;
+  }
+
+  get dragThreshold(): number {
+    return this.config.dragThreshold ?? 5;
+  }
+
   subscribe(callback: Subscriber<TMetadata>): () => void {
     this.subscribers.push(callback);
     return () => {
@@ -57,6 +67,11 @@ export class LayoutEngine<TMetadata = any> {
     this.state = { ...this.state };
     this.subscribers.forEach((sub) => sub(this.state));
     this.queueSave();
+  }
+
+  private mutate(updater: (root: LayoutNode<TMetadata>) => LayoutNode<TMetadata>): void {
+    this.state.root = updater(this.state.root);
+    this.notify();
   }
 
   private queueSave(): void {
@@ -92,46 +107,32 @@ export class LayoutEngine<TMetadata = any> {
       this.config.minRatio,
       Math.min(this.config.maxRatio, ratio)
     );
-    this.state.root = recursiveUpdate(
-      this.state.root,
-      splitId,
-      { ratio: clampedRatio },
-      'split'
-    );
-    this.notify();
+    this.mutate(root => recursiveUpdate(root, splitId, { ratio: clampedRatio }, 'split'));
   }
 
   updateTile(
     tileId: string,
     updates: Partial<Omit<TileNode<TMetadata>, 'id' | 'type'>>
   ): void {
-    this.state.root = recursiveUpdate(
-      this.state.root,
-      tileId,
-      updates,
-      'tile'
-    );
-    this.notify();
+    this.mutate(root => recursiveUpdate(root, tileId, updates, 'tile'));
   }
 
   resetTile(tileId: string): void {
-    this.state.root = recursiveUpdate(
-      this.state.root,
+    this.mutate(root => recursiveUpdate(
+      root,
       tileId,
       { contentId: undefined, metadata: undefined, tabs: undefined, activeTabIndex: undefined },
       'tile'
-    );
-    this.notify();
+    ));
   }
 
   selectTab(tileId: string, index: number): void {
-    this.state.root = recursiveUpdate(
-      this.state.root,
+    this.mutate(root => recursiveUpdate(
+      root,
       tileId,
       { activeTabIndex: index },
       'tile'
-    );
-    this.notify();
+    ));
   }
 
   addTab(tileId: string, contentId: string, metadata?: TMetadata): void {
@@ -141,7 +142,6 @@ export class LayoutEngine<TMetadata = any> {
     const newTab = { id: uuidv4(), contentId, metadata };
     let tabs = node.tabs ? [...node.tabs, newTab] : [];
     
-    // If no tabs exist, but it has content, convert content to first tab
     if (!node.tabs && node.contentId) {
       tabs = [
         { id: uuidv4(), contentId: node.contentId, metadata: node.metadata },
@@ -151,19 +151,17 @@ export class LayoutEngine<TMetadata = any> {
       tabs = [newTab];
     }
 
-    this.state.root = recursiveUpdate(
-      this.state.root,
+    this.mutate(root => recursiveUpdate(
+      root,
       tileId,
       { 
         tabs, 
         activeTabIndex: tabs.length - 1,
-        // Clear legacy single-content fields when moving to tabs
         contentId: undefined,
         metadata: undefined
       },
       'tile'
-    );
-    this.notify();
+    ));
   }
 
   removeTab(tileId: string, tabId: string): void {
@@ -181,19 +179,17 @@ export class LayoutEngine<TMetadata = any> {
       activeIndex = newTabs.length - 1;
     }
 
-    this.state.root = recursiveUpdate(
-      this.state.root,
+    this.mutate(root => recursiveUpdate(
+      root,
       tileId,
       { tabs: newTabs, activeTabIndex: activeIndex },
       'tile'
-    );
-    this.notify();
+    ));
   }
 
   removeTile(tileId: string): void {
     if (this.state.root.id === tileId && this.state.root.type === 'tile') return;
-    this.state.root = recursiveRemove(this.state.root, tileId);
-    this.notify();
+    this.mutate(root => recursiveRemove(root, tileId));
   }
 
   swapTiles(sourceId: string, targetId: string): void {
@@ -203,36 +199,33 @@ export class LayoutEngine<TMetadata = any> {
 
     const sourceData = { ...sourceNode };
     const targetData = { ...targetNode };
-    this.state.root = recursiveSwap(
-      this.state.root,
+    this.mutate(root => recursiveSwap(
+      root,
       sourceId,
       targetId,
       sourceData,
       targetData
-    );
-    this.notify();
+    ));
   }
 
   split(tileId: string, direction: Direction): void {
-    this.state.root = recursiveSplit(
-      this.state.root,
+    this.mutate(root => recursiveSplit(
+      root,
       tileId,
       direction,
       this.config.defaultSplitRatio
-    );
-    this.notify();
+    ));
   }
 
   moveTile(sourceId: string, targetId: string, direction: Direction, side: 'before' | 'after'): void {
     if (sourceId === targetId) return;
-    this.state.root = recursiveMove(
-      this.state.root,
+    this.mutate(root => recursiveMove(
+      root,
       sourceId,
       targetId,
       direction,
       side,
       this.config.defaultSplitRatio
-    );
-    this.notify();
+    ));
   }
 }

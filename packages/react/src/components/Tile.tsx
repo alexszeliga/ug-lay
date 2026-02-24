@@ -15,8 +15,8 @@ const GhostPreview: React.FC<{ action: DropAction }> = ({ action }) => {
 // ... existing GhostPreview implementation (no changes needed)
   const style: React.CSSProperties = {
     position: 'absolute',
-    backgroundColor: 'rgba(255, 204, 0, 0.3)',
-    border: '2px solid #ffcc00',
+    backgroundColor: 'var(--ug-ghost-bg, rgba(255, 204, 0, 0.3))',
+    border: 'var(--ug-ghost-border, 2px solid #ffcc00)',
     pointerEvents: 'none',
     zIndex: 100,
     transition: 'all 0.1s ease-out',
@@ -57,7 +57,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
 
     const onPointerMove = (moveEvent: PointerEvent) => {
       const dist = Math.hypot(moveEvent.clientX - preDragInfo.x, moveEvent.clientY - preDragInfo.y);
-      if (dist > 5) {
+      if (dist > engine.dragThreshold) {
         setPreDragInfo(null);
         startDrag(node.id, moveEvent.clientX, moveEvent.clientY);
       }
@@ -139,7 +139,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
                 style={{
                   padding: '2px 8px',
                   borderRadius: '3px 3px 0 0',
-                  background: idx === activeTabIndex ? 'var(--ug-tile-bg, #2a2a2a)' : 'transparent',
+                  background: idx === activeTabIndex ? 'var(--ug-active-tab-bg, #2a2a2a)' : 'transparent',
                   color: idx === activeTabIndex ? 'var(--ug-header-title, #ccc)' : 'inherit',
                   cursor: 'pointer',
                   fontSize: '10px',
@@ -172,7 +172,7 @@ export function TileComponent<TMetadata = any>({ node }: TileComponentProps<TMet
           <ControlButton onClick={() => engine.maximizeTile(node.id)} title="Maximize">{icons.maximize}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'horizontal')} title="Split Horizontal">{icons.splitH}</ControlButton>
           <ControlButton onClick={() => engine.split(node.id, 'vertical')} title="Split Vertical">{icons.splitV}</ControlButton>
-          <ControlButton onClick={() => engine.removeTile(node.id)} title="Remove" color="#ff4d4d">{icons.remove}</ControlButton>
+          <ControlButton onClick={() => engine.removeTile(node.id)} title="Remove" color="var(--ug-control-danger, #ff4d4d)">{icons.remove}</ControlButton>
         </div>
       </div>
       <div className="ug-tile-content" style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

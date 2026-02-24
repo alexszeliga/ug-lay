@@ -38,6 +38,8 @@ export interface LayoutEngineConfig<TMetadata = any> {
   minRatio: number;
   maxRatio: number;
   defaultSplitRatio: number;
+  gutterSize?: number;    // Default: 4
+  dragThreshold?: number; // Default: 5
   persistence?: PersistenceAdapter<TMetadata>;
   saveDebounceMs?: number;
 }

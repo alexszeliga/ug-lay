@@ -18,7 +18,7 @@ export const Gutter: React.FC<GutterProps> = ({ splitId, direction }) => {
 
     const onPointerMove = (moveEvent: PointerEvent) => {
       if (parentRectRef.current) {
-        const newRatio = calculateRatio(parentRectRef.current, moveEvent.clientX, moveEvent.clientY, direction);
+        const newRatio = calculateRatio(parentRectRef.current, moveEvent.clientX, moveEvent.clientY, direction, engine.gutterSize);
         engine.setRatio(splitId, newRatio);
       }
     };

@@ -14,7 +14,7 @@ describe('Layout Geometry Calculations', () => {
     const container = { width: 1000, height: 800, left: 100, top: 50 };
     const mouseX = 600; // Mouse is at 600px on the screen
 
-    const newRatio = calculateRatio(container, mouseX, 400, 'horizontal');
+    const newRatio = calculateRatio(container, mouseX, 400, 'horizontal', 4);
     
     // Container is 1000px wide, starts at 100px. So it spans 100-1100.
     // Gutter is 4px. Total space is 996.

@@ -49,7 +49,7 @@ export function calculateRatio(
   clientX: number,
   clientY: number,
   direction: 'horizontal' | 'vertical',
-  gutterSize: number = 4
+  gutterSize: number
 ): number {
   if (direction === 'horizontal') {
     const totalWidth = rect.width - gutterSize;
