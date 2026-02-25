@@ -1,9 +1,7 @@
 import { DevServerManager } from '../src/DevServerManager';
+import { DEV_CONFIG } from '../dev-config.js'
 
-const manager = new DevServerManager({
-  phpPort: 8000,
-  vitePort: 3002,
-});
+const manager = new DevServerManager(DEV_CONFIG);
 
 manager.start().catch((err) => {
   console.error('Failed to start dev servers:', err);

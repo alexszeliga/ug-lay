@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { DEV_CONFIG } from './dev-config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,9 +13,9 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3002,
+    port: DEV_CONFIG.vitePort,
     proxy: {
-      '/api': 'http://localhost:8000', // Proxy API calls to PHP
+      '/api': `http://localhost:${DEV_CONFIG.phpPort}`, // Proxy API calls to PHP
     },
   },
 });
