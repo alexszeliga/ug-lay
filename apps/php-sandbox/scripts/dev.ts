@@ -1,4 +1,4 @@
-import { DevServerManager } from '../src/DevServerManager';
+import { DevServerManager } from '../src/DevServerManager.js';
 import { DEV_CONFIG } from '../dev-config.js'
 
 const manager = new DevServerManager(DEV_CONFIG);
